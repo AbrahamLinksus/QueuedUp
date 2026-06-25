@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Platform {
+  LEETCODE
+  OTHER
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum ProblemStatus {
+  ACTIVE_REVIEW
+  MASTERED
+}
+
+enum ReviewStatus {
+  PENDING
+  DONE
+  SKIPPED
+}
+
+model Problem {
+  id         String        @id @default(cuid())
+  title      String
+  url        String
+  platform   Platform      @default(OTHER)
+  difficulty Difficulty
+  status     ProblemStatus @default(ACTIVE_REVIEW)
+  createdAt  DateTime      @default(now())
+
+  tags             Tag[]
+  entries          Entry[]
+  reviews          Review[]
+  flashcardReviews FlashcardReview[]
+}
+
+model Entry {
+  id          String   @id @default(cuid())
+  problemId   String
+  notes       String
+  codeSnippet String
+  codeLanguage String  @default("plaintext")
+
+  timeComplexity  String?
+  spaceComplexity String?
+
+  timeTakenMinutes Int?
+  attemptsCount    Int  @default(1)
+
+  createdAt DateTime @default(now())
+
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@index([problemId])
+}
+
+model Tag {
+  id       String  @id @default(cuid())
+  name     String  @unique
+  isPreset Boolean @default(false)
+
+  problems Problem[]
+}
+
+model Review {
+  id          String       @id @default(cuid())
+  problemId   String
+  scheduledFor DateTime
+  dayOffset   Int
+  status      ReviewStatus @default(PENDING)
+  completedAt DateTime?
+
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@index([problemId])
+  @@index([scheduledFor, status])
+}
+
+model FlashcardReview {
+  id         String   @id @default(cuid())
+  problemId  String
+  reviewedAt DateTime @default(now())
+  recalledOk Boolean
+
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@index([problemId])
+}
