@@ -103,16 +103,17 @@ export function ProblemForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-3.5">
       {/*
-        Desktop two-column grid:
-          Left col  = problem metadata (title, difficulty, tags, status)
-          Right col = entry data (notes, code, complexity+timing)
+        Desktop two-column grid: two independent column divs so row heights
+        don't bleed across columns (avoids the gap caused by a tall Code card
+        stretching the Difficulty row on the left).
       */}
-      <div className={singleColumn ? "space-y-3.5" : "space-y-3.5 md:grid md:grid-cols-2 md:items-start md:gap-4 md:space-y-0"}>
+      <div className={singleColumn ? "space-y-3.5" : "md:grid md:grid-cols-2 md:items-start md:gap-4"}>
 
         {/* ── LEFT COLUMN ──────────────────────────────────────── */}
+        <div className="space-y-3.5">
 
-        {/* Title + URL — left col, row 1 */}
-        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-1 md:row-start-1">
+        {/* Title + URL */}
+        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
           <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">
             Problem Title
           </p>
@@ -155,8 +156,8 @@ export function ProblemForm({
           <input type="hidden" name="platform" value={platform} />
         </div>
 
-        {/* Difficulty — left col, row 2 */}
-        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-1 md:row-start-2">
+        {/* Difficulty */}
+        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
           <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">
             Difficulty
           </p>
@@ -180,8 +181,8 @@ export function ProblemForm({
           </div>
         </div>
 
-        {/* Tags — left col, row 3 */}
-        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-1 md:row-start-3">
+        {/* Tags */}
+        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
           <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Category</p>
           <div className="flex flex-wrap gap-2">
             {presetTags.map((tag) => (
@@ -208,8 +209,8 @@ export function ProblemForm({
           />
         </div>
 
-        {/* Status — left col, row 4 on desktop */}
-        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-1 md:row-start-4">
+        {/* Status */}
+        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
           <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Status</p>
           <input type="hidden" name="status" value={status} />
           {status === "MASTERED" ? (
@@ -232,10 +233,13 @@ export function ProblemForm({
           )}
         </div>
 
-        {/* ── RIGHT COLUMN ─────────────────────────────────────── */}
+        </div>{/* end left column */}
 
-        {/* Notes — right col, row 1 */}
-        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-2 md:row-start-1">
+        {/* ── RIGHT COLUMN ─────────────────────────────────────── */}
+        <div className="mt-3.5 space-y-3.5 md:mt-0">
+
+        {/* Notes */}
+        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Notes</p>
             <span className="text-[10px] text-[#aaa]">optional</span>
@@ -249,8 +253,8 @@ export function ProblemForm({
           />
         </div>
 
-        {/* Code — right col, row 2 — collapsible */}
-        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-2 md:row-start-2">
+        {/* Code — collapsible */}
+        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
           <div className="flex items-center justify-between">
             <p className="text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Code</p>
             {showCode ? (
@@ -289,8 +293,8 @@ export function ProblemForm({
           )}
         </div>
 
-        {/* Complexity + timing — right col, row 3 — collapsible */}
-        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-2 md:row-start-3">
+        {/* Complexity + timing — collapsible */}
+        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
           <div className="flex items-center justify-between">
             <p className="text-[9px] font-bold uppercase tracking-[0.9px] text-muted">
               Complexity &amp; Timing
@@ -356,6 +360,8 @@ export function ProblemForm({
             </div>
           )}
         </div>
+
+        </div>{/* end right column */}
 
       </div>
 
