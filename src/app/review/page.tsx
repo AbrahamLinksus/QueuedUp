@@ -33,15 +33,17 @@ export default async function ReviewPage() {
     getDueFlashcards(userId),
     db.review.findMany({
       where: { status: "PENDING", scheduledFor: { gte: startOfToday, lte: sixMonthsOut }, problem: { userId } },
-      select: { scheduledFor: true },
+      select: { scheduledFor: true, problem: { select: { id: true, title: true, difficulty: true } } },
     }),
   ]);
 
-  const reviewsByDate: Record<string, number> = {};
+  type CalendarProblem = { id: string; title: string; difficulty: string };
+  const reviewsByDate: Record<string, CalendarProblem[]> = {};
   for (const r of monthReviews) {
     const d = r.scheduledFor;
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-    reviewsByDate[key] = (reviewsByDate[key] ?? 0) + 1;
+    if (!reviewsByDate[key]) reviewsByDate[key] = [];
+    reviewsByDate[key].push(r.problem);
   }
 
   const todayStr = `${startOfToday.getFullYear()}-${String(startOfToday.getMonth() + 1).padStart(2, "0")}-${String(startOfToday.getDate()).padStart(2, "0")}`;
