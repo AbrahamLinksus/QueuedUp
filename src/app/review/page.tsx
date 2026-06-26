@@ -16,7 +16,7 @@ export default async function ReviewPage() {
   const endOfToday = new Date(startOfToday);
   endOfToday.setHours(23, 59, 59, 999);
 
-  const endOfMonth = new Date(startOfToday.getFullYear(), startOfToday.getMonth() + 1, 0, 23, 59, 59, 999);
+  const sixMonthsOut = new Date(startOfToday.getFullYear(), startOfToday.getMonth() + 6, 0, 23, 59, 59, 999);
 
   const [dueReviews, upcomingReviews, dueFlashcards, monthReviews] = await Promise.all([
     db.review.findMany({
@@ -32,7 +32,7 @@ export default async function ReviewPage() {
     }),
     getDueFlashcards(userId),
     db.review.findMany({
-      where: { status: "PENDING", scheduledFor: { gte: startOfToday, lte: endOfMonth }, problem: { userId } },
+      where: { status: "PENDING", scheduledFor: { gte: startOfToday, lte: sixMonthsOut }, problem: { userId } },
       select: { scheduledFor: true },
     }),
   ]);
@@ -43,6 +43,8 @@ export default async function ReviewPage() {
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     reviewsByDate[key] = (reviewsByDate[key] ?? 0) + 1;
   }
+
+  const todayStr = `${startOfToday.getFullYear()}-${String(startOfToday.getMonth() + 1).padStart(2, "0")}-${String(startOfToday.getDate()).padStart(2, "0")}`;
 
   return (
     /*
@@ -136,7 +138,7 @@ export default async function ReviewPage() {
 
       {/* Calendar — right col row 3, below upcoming + flashcards */}
       <div className="md:col-start-2 md:row-start-3">
-        <ReviewCalendar reviewsByDate={reviewsByDate} today={startOfToday} />
+        <ReviewCalendar reviewsByDate={reviewsByDate} todayStr={todayStr} />
       </div>
 
       {/* Upcoming — right col row 1 on desktop; last in DOM so it appears last
