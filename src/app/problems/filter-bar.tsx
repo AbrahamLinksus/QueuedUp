@@ -17,10 +17,10 @@ export function FilterBar({ tags }: { tags: Tag[] }) {
   }
 
   const selectClass =
-    "rounded-lg border-[2px] border-foreground bg-background px-3 py-1.5 text-xs font-semibold text-foreground shadow-[2px_2px_0_#111] focus:outline-none";
+    "rounded-lg border-[2px] border-foreground bg-background px-3 py-1.5 text-xs font-semibold text-foreground shadow-[2px_2px_0_#111] focus:outline-none md:w-full";
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2 md:flex-col md:items-stretch">
       <select
         className={selectClass}
         value={searchParams.get("difficulty") ?? "ALL"}

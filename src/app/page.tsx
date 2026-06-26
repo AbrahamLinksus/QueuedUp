@@ -98,6 +98,7 @@ export default async function Home() {
 
   return (
     <div className="space-y-3.5">
+      {/* Header — always full width */}
       <div>
         <h1 className="font-display text-[56px] leading-[0.9] tracking-[3px] text-foreground">
           DASHBOARD
@@ -105,33 +106,53 @@ export default async function Home() {
         <p className="mt-1.5 text-sm text-muted">{dateStr}</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2.5">
-        <StatCard label="Problems Logged" value={stats.totalProblems} index={0} />
-        <StatCard label="Current Streak" value={stats.currentStreak} suffix="days" index={1} />
-        <StatCard label="Longest Streak" value={stats.longestStreak} suffix="days" index={2} />
-        <StatCard label="Mastered" value={stats.statusBreakdown.MASTERED} index={3} />
-      </div>
-
-      <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
-        <p className="mb-2.5 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">
-          Activity · Last 15 Weeks
-        </p>
-        <Heatmap weeks={stats.heatmapWeeks} />
-        <div className="mt-2.5 flex items-center gap-1.5">
-          <span className="text-[10px] text-muted">Less</span>
-          <div className="h-2.5 w-2.5 rounded-[2px] border-[1.5px] border-[#c8c3b8] bg-[#DDD9CC]" />
-          <div className="h-2.5 w-2.5 rounded-[2px] bg-[#888]" />
-          <div className="h-2.5 w-2.5 rounded-[2px] bg-[#111]" />
-          <span className="text-[10px] text-muted">More</span>
-          <div className="flex-1" />
-          <div className="h-2.5 w-2.5 rounded-[2px] bg-danger" />
-          <span className="text-[10px] text-muted">Today</span>
+      {/*
+        Two-column grid on desktop.
+        Mobile (grid-cols-1 gap-3.5): items stack in DOM order →
+          stat cards, heatmap, difficulty bar, stickman.
+        Desktop (md:grid-cols-[380px_1fr]): explicit col/row placement →
+          left=[stat cards (r1), difficulty bar (r2)],
+          right=[heatmap (r1), stickman (r2)].
+      */}
+      <div className="grid grid-cols-1 gap-3.5 md:grid-cols-[380px_1fr] md:items-start md:gap-x-6 md:gap-y-4">
+        {/* Stat cards — left col, row 1 on desktop */}
+        <div className="grid grid-cols-2 gap-2.5 md:col-start-1 md:row-start-1">
+          <StatCard label="Problems Logged" value={stats.totalProblems} index={0} />
+          <StatCard label="Current Streak" value={stats.currentStreak} suffix="days" index={1} />
+          <StatCard label="Longest Streak" value={stats.longestStreak} suffix="days" index={2} />
+          <StatCard label="Mastered" value={stats.statusBreakdown.MASTERED} index={3} />
         </div>
+
+        {/* Heatmap — right col, row 1 on desktop */}
+        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-2 md:row-start-1">
+          <p className="mb-2.5 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">
+            Activity · Last 15 Weeks
+          </p>
+          <Heatmap weeks={stats.heatmapWeeks} />
+          <div className="mt-2.5 flex items-center gap-1.5">
+            <span className="text-[10px] text-muted">Less</span>
+            <div className="h-2.5 w-2.5 rounded-[2px] border-[1.5px] border-[#c8c3b8] bg-[#DDD9CC]" />
+            <div className="h-2.5 w-2.5 rounded-[2px] bg-[#888]" />
+            <div className="h-2.5 w-2.5 rounded-[2px] bg-[#111]" />
+            <span className="text-[10px] text-muted">More</span>
+            <div className="flex-1" />
+            <div className="h-2.5 w-2.5 rounded-[2px] bg-danger" />
+            <span className="text-[10px] text-muted">Today</span>
+          </div>
+        </div>
+
+        {/* Difficulty bar — left col, row 2 on desktop */}
+        <div className="md:col-start-1 md:row-start-2">
+          <DifficultyBar breakdown={stats.difficultyBreakdown} />
+        </div>
+
+        {/* Stickman — right col, row 2 on desktop */}
+        {stats.currentStreak > 0 && (
+          <div className="md:col-start-2 md:row-start-2">
+            <Stickman />
+          </div>
+        )}
       </div>
-
-      <DifficultyBar breakdown={stats.difficultyBreakdown} />
-
-      {stats.currentStreak > 0 && <Stickman />}
     </div>
   );
 }
