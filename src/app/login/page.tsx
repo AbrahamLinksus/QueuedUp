@@ -5,9 +5,9 @@ import { login } from "./actions";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; registered?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, registered } = await searchParams;
 
   return (
     <div className="mx-auto mt-16 max-w-sm space-y-8">
@@ -35,6 +35,7 @@ export default async function LoginPage({
           placeholder="Password"
           className="w-full rounded-xl border-[2.5px] border-foreground bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted shadow-[3px_3px_0_#111] focus:outline-none"
         />
+        {registered && <p className="text-sm text-foreground font-medium">Account created — sign in below.</p>}
         {error && <p className="text-sm text-danger">Incorrect username or password.</p>}
         <MotionButton
           type="submit"

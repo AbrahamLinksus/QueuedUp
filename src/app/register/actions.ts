@@ -1,9 +1,8 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { AUTH_COOKIE_NAME, createSessionToken, hashPassword } from "@/lib/auth";
+import { hashPassword } from "@/lib/auth";
 
 export async function register(formData: FormData) {
   const username = String(formData.get("username") ?? "").trim().toLowerCase();
@@ -17,18 +16,9 @@ export async function register(formData: FormData) {
   const existing = await db.user.findUnique({ where: { username } });
   if (existing) redirect("/register?error=taken");
 
-  const user = await db.user.create({
+  await db.user.create({
     data: { username, passwordHash: await hashPassword(password) },
   });
 
-  const cookieStore = await cookies();
-  cookieStore.set(AUTH_COOKIE_NAME, createSessionToken(user.id), {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 365,
-  });
-
-  redirect("/");
+  redirect("/login?registered=1");
 }

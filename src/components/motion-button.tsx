@@ -1,16 +1,35 @@
 "use client";
 
 import { motion } from "motion/react";
-import type { ComponentProps } from "react";
+import { useFormStatus } from "react-dom";
+import type { ComponentProps, ReactNode } from "react";
 
-export function MotionButton({ className, ...props }: ComponentProps<typeof motion.button>) {
+type Props = Omit<ComponentProps<typeof motion.button>, "children"> & { children?: ReactNode };
+
+export function MotionButton({ className, children, disabled, ...props }: Props) {
+  const { pending } = useFormStatus();
+  const isDisabled = disabled || pending;
+
   return (
     <motion.button
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.96 }}
+      whileHover={isDisabled ? {} : { scale: 1.03 }}
+      whileTap={isDisabled ? {} : { scale: 0.96 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-      className={className}
+      disabled={isDisabled}
+      className={`${className ?? ""} disabled:opacity-50 disabled:cursor-not-allowed`}
       {...props}
-    />
+    >
+      {pending ? (
+        <span className="flex items-center justify-center gap-2">
+          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
+          </svg>
+          {children}
+        </span>
+      ) : (
+        children
+      )}
+    </motion.button>
   );
 }
