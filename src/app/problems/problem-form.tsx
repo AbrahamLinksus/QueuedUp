@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { MotionButton } from "@/components/motion-button";
 import { fetchLeetCodeProblem } from "./actions";
 
@@ -62,6 +63,8 @@ export function ProblemForm({
     !!(initial.timeComplexity || initial.spaceComplexity || initial.timeTakenMinutes)
   );
   const [isPending, startTransition] = useTransition();
+  const [isSubmitting, startSubmit] = useTransition();
+  const router = useRouter();
 
   const inputClass =
     "w-full rounded-lg border-2 border-foreground bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/30";
@@ -85,8 +88,20 @@ export function ProblemForm({
     });
   }
 
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    startSubmit(async () => {
+      try {
+        await action(formData);
+      } finally {
+        router.push("/problems");
+      }
+    });
+  }
+
   return (
-    <form action={action} className="space-y-3.5">
+    <form onSubmit={handleSubmit} className="space-y-3.5">
       {/*
         Desktop two-column grid:
           Left col  = problem metadata (title, difficulty, tags, status)
@@ -347,6 +362,7 @@ export function ProblemForm({
       {/* Submit — always full width below both columns */}
       <MotionButton
         type="submit"
+        loading={isSubmitting}
         className="w-full rounded-xl border-[2.5px] border-foreground bg-foreground py-4 font-display text-[22px] tracking-[2.5px] text-background shadow-[3px_3px_0_#111]"
       >
         {submitLabel.toUpperCase()}

@@ -5,6 +5,7 @@ import { getDueFlashcards } from "@/lib/flashcards";
 import { getCurrentUserId } from "@/lib/session";
 import { DueReviewRow } from "./due-review-row";
 import { FlashcardItem } from "./flashcard-item";
+import { ReviewCalendar } from "./review-calendar";
 
 export default async function ReviewPage() {
   await connection();
@@ -15,7 +16,9 @@ export default async function ReviewPage() {
   const endOfToday = new Date(startOfToday);
   endOfToday.setHours(23, 59, 59, 999);
 
-  const [dueReviews, upcomingReviews, dueFlashcards] = await Promise.all([
+  const endOfMonth = new Date(startOfToday.getFullYear(), startOfToday.getMonth() + 1, 0, 23, 59, 59, 999);
+
+  const [dueReviews, upcomingReviews, dueFlashcards, monthReviews] = await Promise.all([
     db.review.findMany({
       where: { status: "PENDING", scheduledFor: { lte: endOfToday }, problem: { userId } },
       include: { problem: true },
@@ -28,7 +31,18 @@ export default async function ReviewPage() {
       take: 10,
     }),
     getDueFlashcards(userId),
+    db.review.findMany({
+      where: { status: "PENDING", scheduledFor: { gte: startOfToday, lte: endOfMonth }, problem: { userId } },
+      select: { scheduledFor: true },
+    }),
   ]);
+
+  const reviewsByDate: Record<string, number> = {};
+  for (const r of monthReviews) {
+    const d = r.scheduledFor;
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    reviewsByDate[key] = (reviewsByDate[key] ?? 0) + 1;
+  }
 
   return (
     /*
@@ -119,6 +133,11 @@ export default async function ReviewPage() {
           </div>
         </section>
       )}
+
+      {/* Calendar — right col row 3, below upcoming + flashcards */}
+      <div className="md:col-start-2 md:row-start-3">
+        <ReviewCalendar reviewsByDate={reviewsByDate} today={startOfToday} />
+      </div>
 
       {/* Upcoming — right col row 1 on desktop; last in DOM so it appears last
           on mobile, but promoted to row 1 of the right col on desktop. */}

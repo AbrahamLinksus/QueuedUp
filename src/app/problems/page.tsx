@@ -27,13 +27,18 @@ export default async function ProblemsPage({
   if (params.platform) where.platform = params.platform as never;
   if (params.tag) where.tags = { some: { id: params.tag } };
 
-  const [problems, tags] = await Promise.all([
+  const [problems, tags, topicCounts] = await Promise.all([
     db.problem.findMany({
       where,
       include: { tags: true, _count: { select: { entries: true } } },
       orderBy: params.sort === "oldest" ? { createdAt: "asc" } : { createdAt: "desc" },
     }),
     getCachedTags(),
+    db.tag.findMany({
+      where: { problems: { some: { userId } } },
+      include: { _count: { select: { problems: { where: { userId } } } } },
+      orderBy: { name: "asc" },
+    }),
   ]);
 
   if (params.sort === "difficulty") {
@@ -63,11 +68,37 @@ export default async function ProblemsPage({
       */}
       <div className="grid grid-cols-1 gap-3.5 md:grid-cols-[300px_1fr] md:items-start md:gap-6">
         {/* Filter sidebar */}
-        <div className="md:rounded-xl md:border-[2.5px] md:border-foreground md:bg-surface md:p-4 md:shadow-[3px_3px_0_#111]">
-          <p className="mb-3 hidden text-[9px] font-bold uppercase tracking-[0.9px] text-muted md:block">
-            Filters
-          </p>
-          <FilterBar tags={tags} />
+        <div className="space-y-3 md:space-y-4">
+          <div className="md:rounded-xl md:border-[2.5px] md:border-foreground md:bg-surface md:p-4 md:shadow-[3px_3px_0_#111]">
+            <p className="mb-3 hidden text-[9px] font-bold uppercase tracking-[0.9px] text-muted md:block">
+              Filters
+            </p>
+            <FilterBar tags={tags} />
+          </div>
+
+          {topicCounts.length > 0 && (
+            <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
+              <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">
+                Topics
+              </p>
+              <div className="space-y-1.5">
+                {topicCounts.map((tag) => (
+                  <div key={tag.id} className="flex items-center justify-between">
+                    <span className="text-xs text-foreground">{tag.name}</span>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="h-1.5 rounded-full bg-foreground"
+                        style={{ width: `${Math.max(8, (tag._count.problems / problems.length) * 80)}px` }}
+                      />
+                      <span className="w-4 text-right text-xs font-semibold text-foreground">
+                        {tag._count.problems}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Problems list */}

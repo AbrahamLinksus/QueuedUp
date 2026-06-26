@@ -49,8 +49,6 @@ export function Nav() {
           );
         })}
 
-        <div className="flex-1" />
-
         <Link
           href="/problems/new"
           className="rounded-full border-[1.5px] border-white/40 px-3.5 py-[6px] text-[12px] font-bold text-white whitespace-nowrap"
@@ -61,10 +59,14 @@ export function Nav() {
         <form action={logout}>
           <button
             type="submit"
-            className="rounded-full px-3 py-[7px] text-[12px] text-white/40 transition-colors hover:text-white/70 whitespace-nowrap"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-white/40 transition-colors hover:text-white/70"
             title="Sign out"
           >
-            ⎋
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
           </button>
         </form>
       </div>

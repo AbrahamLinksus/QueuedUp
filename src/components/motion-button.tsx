@@ -4,11 +4,15 @@ import { motion } from "motion/react";
 import { useFormStatus } from "react-dom";
 import type { ComponentProps, ReactNode } from "react";
 
-type Props = Omit<ComponentProps<typeof motion.button>, "children"> & { children?: ReactNode };
+type Props = Omit<ComponentProps<typeof motion.button>, "children"> & {
+  children?: ReactNode;
+  loading?: boolean;
+};
 
-export function MotionButton({ className, children, disabled, ...props }: Props) {
+export function MotionButton({ className, children, disabled, loading, ...props }: Props) {
   const { pending } = useFormStatus();
-  const isDisabled = disabled || pending;
+  const isLoading = loading || pending;
+  const isDisabled = disabled || isLoading;
 
   return (
     <motion.button
@@ -19,7 +23,7 @@ export function MotionButton({ className, children, disabled, ...props }: Props)
       className={`${className ?? ""} disabled:opacity-50 disabled:cursor-not-allowed`}
       {...props}
     >
-      {pending ? (
+      {isLoading ? (
         <span className="flex items-center justify-center gap-2">
           <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
