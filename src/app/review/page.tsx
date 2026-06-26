@@ -47,25 +47,27 @@ export default async function ReviewPage() {
         </div>
       </div>
 
-      <section className="space-y-3">
-        {dueReviews.map((review, index) => {
-          const isOverdue = review.scheduledFor < startOfToday;
-          const daysAgo = isOverdue
-            ? Math.round(
-                (startOfToday.getTime() - review.scheduledFor.getTime()) / 86_400_000
-              )
-            : undefined;
-          return (
-            <DueReviewRow
-              key={review.id}
-              review={review}
-              isOverdue={isOverdue}
-              daysAgo={daysAgo}
-              index={index}
-            />
-          );
-        })}
-      </section>
+      {dueReviews.length > 0 && (
+        <section className="space-y-3">
+          {dueReviews.map((review, index) => {
+            const isOverdue = review.scheduledFor < startOfToday;
+            const daysAgo = isOverdue
+              ? Math.round(
+                  (startOfToday.getTime() - review.scheduledFor.getTime()) / 86_400_000
+                )
+              : undefined;
+            return (
+              <DueReviewRow
+                key={review.id}
+                review={review}
+                isOverdue={isOverdue}
+                daysAgo={daysAgo}
+                index={index}
+              />
+            );
+          })}
+        </section>
+      )}
 
       {dueReviews.length > 0 && (
         <div className="flex items-center gap-3 py-1">
@@ -107,18 +109,20 @@ export default async function ReviewPage() {
             {upcomingReviews.map((review, i) => (
               <div
                 key={review.id}
-                className={`flex items-center justify-between px-4 py-3 text-sm ${
+                className={`flex items-center gap-3 px-4 py-3 text-sm ${
                   i < upcomingReviews.length - 1 ? "border-b border-[#eee]" : ""
                 }`}
               >
                 <Link
                   href={`/problems/${review.problem.id}`}
-                  className="font-medium text-foreground hover:underline"
+                  className="min-w-0 flex-1 truncate font-medium text-foreground hover:underline"
                 >
                   {review.problem.title}
                 </Link>
-                <span className="text-muted">Day +{review.dayOffset}</span>
-                <span className="text-muted">{review.scheduledFor.toLocaleDateString()}</span>
+                <span className="shrink-0 text-muted">+{review.dayOffset}d</span>
+                <span className="shrink-0 text-muted">
+                  {review.scheduledFor.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                </span>
               </div>
             ))}
           </div>
