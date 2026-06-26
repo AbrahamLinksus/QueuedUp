@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { db } from "@/lib/db";
 import { FINAL_REVIEW_DAY_OFFSET } from "@/lib/reviews";
 
@@ -26,6 +26,7 @@ export async function completeReview(reviewId: string, outcome: "DONE" | "SKIPPE
   revalidatePath("/review");
   revalidatePath("/");
   revalidatePath(`/problems/${review.problemId}`);
+  revalidateTag("stats", "max");
 }
 
 export async function reviewFlashcard(problemId: string, recalledOk: boolean) {

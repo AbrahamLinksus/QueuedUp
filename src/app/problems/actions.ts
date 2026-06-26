@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { scheduleReviews } from "@/lib/reviews";
@@ -61,6 +61,8 @@ export async function createProblem(formData: FormData) {
   await scheduleReviews(problem.id, problem.createdAt);
 
   revalidatePath("/problems");
+  revalidateTag("stats", "max");
+  revalidateTag("tags", "max");
   redirect(`/problems/${problem.id}`);
 }
 
@@ -85,6 +87,7 @@ export async function updateProblem(problemId: string, formData: FormData) {
 
   revalidatePath("/problems");
   revalidatePath(`/problems/${problemId}`);
+  revalidateTag("stats", "max");
   redirect(`/problems/${problemId}`);
 }
 
@@ -92,6 +95,7 @@ export async function deleteProblem(problemId: string) {
   await db.problem.delete({ where: { id: problemId } });
 
   revalidatePath("/problems");
+  revalidateTag("stats", "max");
   redirect("/problems");
 }
 

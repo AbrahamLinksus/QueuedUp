@@ -1,12 +1,12 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getDueFlashcards } from "@/lib/flashcards";
 import { DueReviewRow } from "./due-review-row";
 import { FlashcardItem } from "./flashcard-item";
 
-export const dynamic = "force-dynamic";
-
 export default async function ReviewPage() {
+  await connection();
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
   const endOfToday = new Date(startOfToday);

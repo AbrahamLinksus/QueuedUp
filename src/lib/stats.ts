@@ -1,3 +1,4 @@
+import { cacheTag, cacheLife } from "next/cache";
 import { db } from "@/lib/db";
 
 const HEATMAP_DAYS = 84;
@@ -78,6 +79,10 @@ function computeStreaks(activeDates: Set<string>, today: Date) {
 }
 
 export async function getDashboardStats() {
+  "use cache";
+  cacheTag("stats");
+  cacheLife("hours");
+
   const today = startOfDay(new Date());
   const endOfToday = new Date(today);
   endOfToday.setHours(23, 59, 59, 999);

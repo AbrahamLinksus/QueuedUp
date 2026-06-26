@@ -1,8 +1,7 @@
+import { connection } from "next/server";
 import { getDashboardStats } from "@/lib/stats";
 import { Heatmap } from "@/components/heatmap";
 import { StatCard } from "@/components/stat-card";
-
-export const dynamic = "force-dynamic";
 
 function DifficultyBar({ breakdown }: { breakdown: Record<string, number> }) {
   const easy = breakdown.EASY ?? 0;
@@ -87,6 +86,7 @@ function Stickman() {
 }
 
 export default async function Home() {
+  await connection();
   const stats = await getDashboardStats();
   const today = new Date();
   const dateStr = today.toLocaleDateString("en-US", {

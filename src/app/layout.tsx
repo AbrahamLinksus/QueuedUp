@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Bangers, DM_Sans } from "next/font/google";
 import { Nav } from "@/components/nav";
@@ -34,7 +35,9 @@ export default function RootLayout({
         <main className="mx-auto w-full max-w-md flex-1 px-4 pb-32 pt-8">
           <PageTransition>{children}</PageTransition>
         </main>
-        <Nav />
+        <Suspense>
+          <Nav />
+        </Suspense>
       </body>
     </html>
   );

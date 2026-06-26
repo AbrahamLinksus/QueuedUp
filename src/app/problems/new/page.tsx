@@ -3,8 +3,6 @@ import { db } from "@/lib/db";
 import { ProblemForm } from "../problem-form";
 import { createProblem } from "../actions";
 
-export const dynamic = "force-dynamic";
-
 export default async function NewProblemPage() {
   const presetTags = await db.tag.findMany({
     where: { isPreset: true },

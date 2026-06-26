@@ -1,7 +1,15 @@
+import { cacheTag, cacheLife } from "next/cache";
 import { db } from "@/lib/db";
 import type { Prisma } from "@/generated/prisma/client";
 import { FilterBar } from "./filter-bar";
 import { ProblemsCardGrid } from "./problems-card-grid";
+
+async function getCachedTags() {
+  "use cache";
+  cacheTag("tags");
+  cacheLife("hours");
+  return db.tag.findMany({ orderBy: { name: "asc" } });
+}
 
 const DIFFICULTY_RANK = { EASY: 0, MEDIUM: 1, HARD: 2 } as const;
 
@@ -24,7 +32,7 @@ export default async function ProblemsPage({
       include: { tags: true, _count: { select: { entries: true } } },
       orderBy: params.sort === "oldest" ? { createdAt: "asc" } : { createdAt: "desc" },
     }),
-    db.tag.findMany({ orderBy: { name: "asc" } }),
+    getCachedTags(),
   ]);
 
   if (params.sort === "difficulty") {
