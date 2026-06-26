@@ -1,5 +1,7 @@
 "use client";
 
+import { MotionButton } from "@/components/motion-button";
+
 export function DeleteButton({ action }: { action: () => void | Promise<void> }) {
   return (
     <form
@@ -10,12 +12,12 @@ export function DeleteButton({ action }: { action: () => void | Promise<void> })
         }
       }}
     >
-      <button
+      <MotionButton
         type="submit"
         className="rounded-md border border-danger/40 px-3 py-1.5 text-sm text-danger hover:bg-danger/10"
       >
         Delete
-      </button>
+      </MotionButton>
     </form>
   );
 }

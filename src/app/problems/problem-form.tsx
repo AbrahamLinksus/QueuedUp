@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { MotionButton } from "@/components/motion-button";
 import { fetchLeetCodeProblem } from "./actions";
 
 type PresetTag = { id: string; name: string };
@@ -73,14 +74,14 @@ export function ProblemForm({
                 placeholder="https://leetcode.com/problems/..."
                 className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
-              <button
+              <MotionButton
                 type="button"
                 onClick={handleAutofill}
                 disabled={!url || isPending}
                 className="shrink-0 rounded-md border border-border px-3 py-2 text-sm text-muted hover:bg-white/5 disabled:opacity-50"
               >
                 {isPending ? "Fetching…" : "Autofill"}
-              </button>
+              </MotionButton>
             </div>
             {autofillStatus && <p className="mt-1 text-xs text-muted">{autofillStatus}</p>}
           </label>
@@ -129,7 +130,7 @@ export function ProblemForm({
           {presetTags.map((tag) => (
             <label
               key={tag.id}
-              className="cursor-pointer rounded-full border border-border px-3 py-1 text-xs text-muted transition-colors has-[:checked]:border-accent has-[:checked]:bg-accent/15 has-[:checked]:text-accent-foreground"
+              className="cursor-pointer rounded-full border border-border px-3 py-1 text-xs text-muted transition-colors has-[:checked]:border-accent has-[:checked]:text-accent"
             >
               <input
                 type="checkbox"
@@ -226,12 +227,12 @@ export function ProblemForm({
         </div>
       </section>
 
-      <button
+      <MotionButton
         type="submit"
-        className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:bg-accent/90"
+        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
       >
         {submitLabel}
-      </button>
+      </MotionButton>
     </form>
   );
 }

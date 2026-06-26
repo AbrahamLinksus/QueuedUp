@@ -3,9 +3,9 @@
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const COLORS: Record<string, string> = {
-  Easy: "#34d399",
-  Medium: "#fbbf24",
-  Hard: "#f87171",
+  Easy: "#4ade80",
+  Medium: "#c2c20a",
+  Hard: "#ef4444",
 };
 
 export function DifficultyChart({
@@ -27,13 +27,13 @@ export function DifficultyChart({
           type="category"
           dataKey="name"
           width={64}
-          tick={{ fill: "#a1a1aa", fontSize: 12 }}
+          tick={{ fill: "#9c9b8e", fontSize: 12 }}
           axisLine={false}
           tickLine={false}
         />
         <Tooltip
-          contentStyle={{ background: "#18181b", border: "1px solid #27272a", fontSize: 12 }}
-          labelStyle={{ color: "#e4e4e7" }}
+          contentStyle={{ background: "#2b2c27", border: "1px solid #3c3d37", fontSize: 12 }}
+          labelStyle={{ color: "#ececE2" }}
           cursor={{ fill: "rgba(255,255,255,0.04)" }}
         />
         <Bar dataKey="value" radius={[4, 4, 4, 4]} barSize={18}>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import { Nav } from "@/components/nav";
+import { PageTransition } from "@/components/page-transition";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,8 +14,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  weight: ["500", "700"],
+});
+
 export const metadata: Metadata = {
-  title: "DSA Journal",
+  title: "QueuedUp",
   description: "Personal DSA practice journal with spaced-repetition review.",
 };
 
@@ -26,11 +33,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-32 pt-10">
+          <PageTransition>{children}</PageTransition>
+        </main>
         <Nav />
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
       </body>
     </html>
   );

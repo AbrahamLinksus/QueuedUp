@@ -1,19 +1,11 @@
 import Link from "next/link";
 import { getDashboardStats } from "@/lib/stats";
 import { Heatmap } from "@/components/heatmap";
+import { StatCard } from "@/components/stat-card";
 import { DifficultyChart } from "@/components/charts/difficulty-chart";
 import { TagCoverageChart } from "@/components/charts/tag-coverage-chart";
 
 export const dynamic = "force-dynamic";
-
-function StatCard({ label, value, tone }: { label: string; value: number; tone?: string }) {
-  return (
-    <div className="rounded-lg border border-border bg-surface p-4">
-      <p className="text-xs text-muted">{label}</p>
-      <p className={`mt-1 text-2xl font-semibold ${tone ?? "text-foreground"}`}>{value}</p>
-    </div>
-  );
-}
 
 export default async function Home() {
   const stats = await getDashboardStats();
@@ -21,17 +13,22 @@ export default async function Home() {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
+        <h1 className="font-display text-xl font-bold text-foreground">Dashboard</h1>
         <Link href="/review" className="text-sm text-accent hover:underline">
           Go to review →
         </Link>
       </div>
 
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Problems logged" value={stats.totalProblems} />
-        <StatCard label="Current streak" value={stats.currentStreak} tone="text-success" />
-        <StatCard label="Longest streak" value={stats.longestStreak} />
-        <StatCard label="Mastered" value={stats.statusBreakdown.MASTERED} tone="text-accent-foreground" />
+        <StatCard label="Problems logged" value={stats.totalProblems} index={0} />
+        <StatCard label="Current streak" value={stats.currentStreak} tone="text-success" index={1} />
+        <StatCard label="Longest streak" value={stats.longestStreak} index={2} />
+        <StatCard
+          label="Mastered"
+          value={stats.statusBreakdown.MASTERED}
+          tone="text-accent"
+          index={3}
+        />
       </section>
 
       <section className="space-y-2">
@@ -50,8 +47,13 @@ export default async function Home() {
           <h2 className="mb-2 text-sm font-medium text-muted">Review health</h2>
           <div className="grid grid-cols-3 gap-3">
             <StatCard label="Overdue" value={stats.reviewHealth.overdue} tone="text-danger" />
-            <StatCard label="Due today" value={stats.reviewHealth.dueToday} tone="text-warning" />
-            <StatCard label="Upcoming (7d)" value={stats.reviewHealth.upcoming} />
+            <StatCard
+              label="Due today"
+              value={stats.reviewHealth.dueToday}
+              tone="text-warning"
+              index={1}
+            />
+            <StatCard label="Upcoming (7d)" value={stats.reviewHealth.upcoming} index={2} />
           </div>
           <p className="mt-3 text-xs text-muted">
             {stats.statusBreakdown.ACTIVE_REVIEW} problem

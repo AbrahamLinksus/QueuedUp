@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "motion/react";
 import type { HeatmapDay } from "@/lib/stats";
 
 function levelClass(count: number) {
@@ -13,8 +16,12 @@ export function Heatmap({ weeks }: { weeks: HeatmapDay[][] }) {
       {weeks.map((week, weekIndex) => (
         <div key={weekIndex} className="flex flex-col gap-1">
           {week.map((day, dayIndex) => (
-            <div
+            <motion.div
               key={dayIndex}
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: (weekIndex * 7 + dayIndex) * 0.003, duration: 0.2 }}
+              whileHover={day.date ? { scale: 1.4 } : undefined}
               title={day.date ? `${day.date}: ${day.count} logged` : undefined}
               className={`h-3 w-3 rounded-sm ${day.date ? levelClass(day.count) : "bg-transparent"}`}
             />

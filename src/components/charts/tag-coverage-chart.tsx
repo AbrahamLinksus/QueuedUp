@@ -15,16 +15,16 @@ export function TagCoverageChart({
           type="category"
           dataKey="name"
           width={120}
-          tick={{ fill: "#a1a1aa", fontSize: 12 }}
+          tick={{ fill: "#9c9b8e", fontSize: 12 }}
           axisLine={false}
           tickLine={false}
         />
         <Tooltip
-          contentStyle={{ background: "#18181b", border: "1px solid #27272a", fontSize: 12 }}
-          labelStyle={{ color: "#e4e4e7" }}
+          contentStyle={{ background: "#2b2c27", border: "1px solid #3c3d37", fontSize: 12 }}
+          labelStyle={{ color: "#ececE2" }}
           cursor={{ fill: "rgba(255,255,255,0.04)" }}
         />
-        <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 4, 4]} barSize={14} />
+        <Bar dataKey="count" fill="#c2c20a" radius={[4, 4, 4, 4]} barSize={14} />
       </BarChart>
     </ResponsiveContainer>
   );

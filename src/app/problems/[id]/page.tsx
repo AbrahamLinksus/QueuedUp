@@ -33,7 +33,7 @@ export default async function ProblemDetailPage({
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">{problem.title}</h1>
+          <h1 className="font-display text-xl font-bold text-foreground">{problem.title}</h1>
           <a
             href={problem.url}
             target="_blank"
