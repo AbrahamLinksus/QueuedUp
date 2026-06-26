@@ -197,44 +197,24 @@ export function ProblemForm({
         <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-1 md:row-start-4">
           <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Status</p>
           <input type="hidden" name="status" value={status} />
-          <div className="flex gap-2">
+          {status === "MASTERED" ? (
+            <div className="flex items-center gap-2 rounded-lg border-[2.5px] border-foreground bg-foreground px-4 py-2.5">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0">
+                <polyline points="1.5,6 4.5,9.5 10.5,2.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="text-xs font-bold text-background">MASTERED</span>
+              <span className="ml-auto text-[10px] text-background opacity-60">earned via reviews</span>
+            </div>
+          ) : (
             <button
               type="button"
               onClick={() => setStatus("ACTIVE_REVIEW")}
-              className={`flex flex-1 items-center justify-center gap-2 rounded-lg border-[2.5px] border-foreground py-2.5 text-xs font-bold transition-colors ${
-                status === "ACTIVE_REVIEW"
-                  ? "bg-foreground text-background"
-                  : "bg-background text-foreground"
-              }`}
+              className="flex w-full items-center justify-center gap-2 rounded-lg border-[2.5px] border-foreground bg-foreground py-2.5 text-xs font-bold text-background"
             >
-              <div
-                className={`h-2 w-2 shrink-0 rounded-full ${
-                  status === "ACTIVE_REVIEW" ? "bg-background" : "bg-foreground"
-                }`}
-              />
+              <div className="h-2 w-2 shrink-0 rounded-full bg-background" />
               ACTIVE
             </button>
-            <button
-              type="button"
-              onClick={() => setStatus("MASTERED")}
-              className={`flex flex-1 items-center justify-center gap-2 rounded-lg border-[2.5px] border-foreground py-2.5 text-xs font-bold transition-colors ${
-                status === "MASTERED"
-                  ? "bg-foreground text-background"
-                  : "bg-background text-foreground"
-              }`}
-            >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0">
-                <polyline
-                  points="1.5,6 4.5,9.5 10.5,2.5"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              MASTERED
-            </button>
-          </div>
+          )}
         </div>
 
         {/* ── RIGHT COLUMN ─────────────────────────────────────── */}

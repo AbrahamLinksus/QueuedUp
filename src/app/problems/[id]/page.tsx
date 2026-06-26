@@ -30,7 +30,7 @@ export default async function ProblemDetailPage({
   const latestEntry = problem.entries[0];
 
   return (
-    <div className="mx-auto max-w-xl space-y-4">
+    <div className="space-y-4">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-[42px] leading-[0.9] tracking-[2px] text-foreground">
