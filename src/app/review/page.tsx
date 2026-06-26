@@ -28,8 +28,19 @@ export default async function ReviewPage() {
   ]);
 
   return (
-    <div className="space-y-3.5">
-      <div>
+    /*
+      Two-column grid on desktop.
+      Mobile (grid-cols-1 gap-3.5): items stack in DOM order →
+        header, due reviews, separator, flashcards, upcoming.
+      Desktop (md:grid-cols-[380px_1fr]): explicit col/row placement →
+        left=[header (r1), due reviews (r2), separator (r3)],
+        right=[upcoming (r1), flashcards (r2)].
+      md:col-start-* and md:row-start-* are no-ops on mobile (single col,
+      auto-placement follows DOM order).
+    */
+    <div className="grid grid-cols-1 gap-3.5 md:grid-cols-[380px_1fr] md:items-start md:gap-x-6 md:gap-y-4">
+      {/* Header — left col, row 1 on desktop */}
+      <div className="md:col-start-1 md:row-start-1">
         <h1 className="font-display text-[56px] leading-[0.9] tracking-[3px] text-foreground">
           REVIEW
         </h1>
@@ -47,7 +58,8 @@ export default async function ReviewPage() {
         </div>
       </div>
 
-      <section className="space-y-3">
+      {/* Due reviews — left col, row 2 on desktop */}
+      <section className="space-y-3 md:col-start-1 md:row-start-2">
         {dueReviews.map((review, index) => {
           const isOverdue = review.scheduledFor < startOfToday;
           const daysAgo = isOverdue
@@ -67,8 +79,9 @@ export default async function ReviewPage() {
         })}
       </section>
 
+      {/* Separator — left col, row 3 on desktop */}
       {dueReviews.length > 0 && (
-        <div className="flex items-center gap-3 py-1">
+        <div className="flex items-center gap-3 py-1 md:col-start-1 md:row-start-3">
           <div className="h-[1.5px] flex-1 bg-foreground opacity-10" />
           <span className="text-xs text-muted">
             all caught up after {dueReviews.length === 1 ? "this" : "these"} {dueReviews.length}
@@ -77,8 +90,10 @@ export default async function ReviewPage() {
         </div>
       )}
 
+      {/* Flashcards — right col row 2 on desktop; appears before upcoming in DOM
+          so mobile order is preserved (flashcards first, upcoming last). */}
       {dueFlashcards.length > 0 && (
-        <section className="space-y-3">
+        <section className="space-y-3 md:col-start-2 md:row-start-2">
           <div>
             <h2 className="font-display text-[22px] tracking-[1.5px] text-foreground">
               FLASHCARDS
@@ -100,8 +115,10 @@ export default async function ReviewPage() {
         </section>
       )}
 
+      {/* Upcoming — right col row 1 on desktop; last in DOM so it appears last
+          on mobile, but promoted to row 1 of the right col on desktop. */}
       {upcomingReviews.length > 0 && (
-        <section className="space-y-3">
+        <section className="space-y-3 md:col-start-2 md:row-start-1">
           <h2 className="font-display text-[22px] tracking-[1.5px] text-foreground">UPCOMING</h2>
           <div className="overflow-hidden rounded-xl border-[2.5px] border-foreground bg-surface shadow-[3px_3px_0_#111]">
             {upcomingReviews.map((review, i) => (

@@ -43,6 +43,7 @@ export default async function ProblemsPage({
 
   return (
     <div className="space-y-3.5">
+      {/* Header — always full width above both columns */}
       <div>
         <h1 className="font-display text-[56px] leading-[0.9] tracking-[3px] text-foreground">
           LOG
@@ -52,9 +53,25 @@ export default async function ProblemsPage({
         </p>
       </div>
 
-      <FilterBar tags={tags} />
+      {/*
+        Two-column grid on desktop:
+          left sidebar (~300px) = filter controls in a neo-brutalist card
+          right content = scrollable problem list
+        Mobile (grid-cols-1 gap-3.5): FilterBar then ProblemsCardGrid — same as before.
+        The md: sidebar card classes only activate at ≥768px so mobile has no card wrapper.
+      */}
+      <div className="grid grid-cols-1 gap-3.5 md:grid-cols-[300px_1fr] md:items-start md:gap-6">
+        {/* Filter sidebar */}
+        <div className="md:rounded-xl md:border-[2.5px] md:border-foreground md:bg-surface md:p-4 md:shadow-[3px_3px_0_#111]">
+          <p className="mb-3 hidden text-[9px] font-bold uppercase tracking-[0.9px] text-muted md:block">
+            Filters
+          </p>
+          <FilterBar tags={tags} />
+        </div>
 
-      <ProblemsCardGrid problems={problems} />
+        {/* Problems list */}
+        <ProblemsCardGrid problems={problems} />
+      </div>
     </div>
   );
 }
