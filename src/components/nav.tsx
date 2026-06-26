@@ -6,8 +6,8 @@ import { motion } from "motion/react";
 
 const links = [
   { href: "/", label: "Dashboard" },
-  { href: "/problems", label: "Problems" },
   { href: "/review", label: "Review" },
+  { href: "/problems", label: "Log" },
 ];
 
 export function Nav() {
@@ -22,47 +22,40 @@ export function Nav() {
       transition={{ type: "spring", stiffness: 300, damping: 28 }}
       className="fixed inset-x-0 bottom-6 z-50 flex justify-center px-4"
     >
-      <div className="flex items-center gap-1 rounded-full border border-white/10 bg-surface/95 p-2 shadow-2xl shadow-black/50 backdrop-blur">
+      <div className="flex items-center gap-1 rounded-full bg-[#111] p-1.5 shadow-[0_3px_14px_rgba(0,0,0,0.28)]">
         <Link
           href="/"
-          className="font-display flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black text-sm font-bold text-primary"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F5F1E8] font-display text-[15px] tracking-[0.5px] text-[#111]"
         >
           Q.
         </Link>
 
-        <nav className="flex items-center gap-1 px-1">
-          {links.map((link) => {
-            const isActive =
-              link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`relative rounded-full px-4 py-2 text-sm transition-colors ${
-                  isActive ? "text-accent" : "text-muted hover:text-foreground"
-                }`}
-              >
-                {isActive && (
-                  <motion.span
-                    layoutId="nav-active-pill"
-                    className="absolute inset-0 rounded-full border border-accent"
-                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                  />
-                )}
-                <span className="relative">{link.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
+        {links.map((link) => {
+          const isActive =
+            link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`rounded-full px-3.5 py-[7px] text-[12px] font-medium transition-colors whitespace-nowrap ${
+                isActive
+                  ? "bg-white font-bold text-[#111]"
+                  : "text-white/60 hover:text-white/80"
+              }`}
+            >
+              {link.label}
+            </Link>
+          );
+        })}
 
-        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Link
-            href="/problems/new"
-            className="block rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
-          >
-            + New
-          </Link>
-        </motion.div>
+        <div className="flex-1" />
+
+        <Link
+          href="/problems/new"
+          className="rounded-full border-[1.5px] border-white/40 px-3.5 py-[6px] text-[12px] font-bold text-white whitespace-nowrap"
+        >
+          + New
+        </Link>
       </div>
     </motion.div>
   );

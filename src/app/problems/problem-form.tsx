@@ -11,6 +11,7 @@ export type ProblemFormInitial = {
   url?: string;
   platform?: string;
   difficulty?: string;
+  status?: string;
   tagIds?: string[];
   customTags?: string;
   notes?: string;
@@ -21,6 +22,19 @@ export type ProblemFormInitial = {
   timeTakenMinutes?: string;
   attemptsCount?: string;
 };
+
+const DIFFICULTIES = ["EASY", "MEDIUM", "HARD"] as const;
+const DIFFICULTY_LABELS: Record<string, string> = { EASY: "EASY", MEDIUM: "MED", HARD: "HARD" };
+
+function DifficultyIcon({ difficulty }: { difficulty: string }) {
+  if (difficulty === "EASY")
+    return <div className="h-[9px] w-[9px] shrink-0 rounded-full border-2 border-current" />;
+  if (difficulty === "MEDIUM")
+    return (
+      <div className="-mt-px h-0 w-0 shrink-0 border-b-[9px] border-l-[5px] border-r-[5px] border-b-current border-l-transparent border-r-transparent" />
+    );
+  return <div className="h-[9px] w-[9px] shrink-0 border-2 border-current" />;
+}
 
 export function ProblemForm({
   action,
@@ -39,8 +53,12 @@ export function ProblemForm({
   const [url, setUrl] = useState(initial.url ?? "");
   const [platform, setPlatform] = useState(initial.platform ?? "OTHER");
   const [difficulty, setDifficulty] = useState(initial.difficulty ?? "MEDIUM");
+  const [status, setStatus] = useState(initial.status ?? "ACTIVE_REVIEW");
   const [autofillStatus, setAutofillStatus] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const inputClass =
+    "w-full rounded-lg border-2 border-foreground bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/30";
 
   function handleAutofill() {
     setAutofillStatus(null);
@@ -53,84 +71,85 @@ export function ProblemForm({
       setTitle(result.title);
       setDifficulty(result.difficulty);
       setPlatform("LEETCODE");
-      setAutofillStatus(`Filled in "${result.title}" (${result.difficulty}).`);
+      setAutofillStatus(`Filled "${result.title}" (${result.difficulty}).`);
     });
   }
 
   return (
-    <form action={action} className="space-y-6">
-      <section className="space-y-3 rounded-lg border border-border bg-surface p-4">
-        <h2 className="text-sm font-medium text-muted">Problem</h2>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block text-sm sm:col-span-2">
-            <span className="mb-1 block text-muted">URL</span>
-            <div className="flex gap-2">
-              <input
-                name="url"
-                type="url"
-                required
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://leetcode.com/problems/..."
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-              />
-              <MotionButton
-                type="button"
-                onClick={handleAutofill}
-                disabled={!url || isPending}
-                className="shrink-0 rounded-md border border-border px-3 py-2 text-sm text-muted hover:bg-white/5 disabled:opacity-50"
-              >
-                {isPending ? "Fetching…" : "Autofill"}
-              </MotionButton>
-            </div>
-            {autofillStatus && <p className="mt-1 text-xs text-muted">{autofillStatus}</p>}
-          </label>
-          <label className="block text-sm">
-            <span className="mb-1 block text-muted">Title</span>
+    <form action={action} className="space-y-3.5">
+      {/* Title + URL */}
+      <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
+        <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">
+          Problem Title
+        </p>
+        <input
+          name="title"
+          required
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="e.g. Two Sum"
+          className={inputClass}
+        />
+        <div className="mt-2 flex gap-2">
+          <div className="flex flex-1 items-center gap-2 rounded-lg border-2 border-[#ccc] bg-background px-3 py-2.5">
+            <span className="shrink-0 text-xs text-muted">URL</span>
+            <div className="h-3.5 w-px shrink-0 bg-[#ccc]" />
             <input
-              name="title"
+              name="url"
+              type="url"
               required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="leetcode.com/problems/..."
+              className="min-w-0 flex-1 bg-transparent text-xs text-foreground focus:outline-none"
             />
-          </label>
-          <label className="block text-sm">
-            <span className="mb-1 block text-muted">Platform</span>
-            <select
-              name="platform"
-              value={platform}
-              onChange={(e) => setPlatform(e.target.value)}
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-            >
-              <option value="LEETCODE">LeetCode</option>
-              <option value="OTHER">Other</option>
-            </select>
-          </label>
-          <label className="block text-sm">
-            <span className="mb-1 block text-muted">Difficulty</span>
-            <select
-              name="difficulty"
-              required
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-            >
-              <option value="EASY">Easy</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HARD">Hard</option>
-            </select>
-          </label>
+          </div>
+          <MotionButton
+            type="button"
+            onClick={handleAutofill}
+            disabled={!url || isPending}
+            className="shrink-0 rounded-lg border-2 border-[#ccc] px-3 py-2.5 text-xs font-semibold text-muted hover:border-foreground disabled:opacity-40"
+          >
+            {isPending ? "…" : "Autofill"}
+          </MotionButton>
         </div>
-      </section>
+        {autofillStatus && <p className="mt-1.5 text-xs text-muted">{autofillStatus}</p>}
+        <input type="hidden" name="platform" value={platform} />
+      </div>
 
-      <section className="space-y-3 rounded-lg border border-border bg-surface p-4">
-        <h2 className="text-sm font-medium text-muted">Tags</h2>
+      {/* Difficulty */}
+      <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
+        <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">
+          Difficulty
+        </p>
+        <input type="hidden" name="difficulty" value={difficulty} />
+        <div className="flex gap-2">
+          {DIFFICULTIES.map((d) => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => setDifficulty(d)}
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg border-[2.5px] border-foreground py-2.5 text-xs font-bold transition-colors ${
+                difficulty === d
+                  ? "bg-foreground text-background"
+                  : "bg-background text-foreground"
+              }`}
+            >
+              <DifficultyIcon difficulty={d} />
+              {DIFFICULTY_LABELS[d]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Tags */}
+      <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
+        <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Category</p>
         <div className="flex flex-wrap gap-2">
           {presetTags.map((tag) => (
             <label
               key={tag.id}
-              className="cursor-pointer rounded-full border border-border px-3 py-1 text-xs text-muted transition-colors has-[:checked]:border-accent has-[:checked]:text-accent"
+              className="cursor-pointer rounded-full border-2 border-foreground px-3 py-1 text-xs font-semibold text-foreground transition-colors has-[:checked]:bg-foreground has-[:checked]:font-bold has-[:checked]:text-background"
             >
               <input
                 type="checkbox"
@@ -142,96 +161,156 @@ export function ProblemForm({
               {tag.name}
             </label>
           ))}
-        </div>
-        <label className="block text-sm">
-          <span className="mb-1 block text-muted">Custom tags (comma-separated)</span>
-          <input
-            name="customTags"
-            defaultValue={initial.customTags}
-            placeholder="e.g. Segment Tree, Meet in the Middle"
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-          />
-        </label>
-      </section>
-
-      <section className="space-y-3 rounded-lg border border-border bg-surface p-4">
-        <h2 className="text-sm font-medium text-muted">Notes &amp; solution</h2>
-        <label className="block text-sm">
-          <span className="mb-1 block text-muted">Approach notes</span>
-          <textarea
-            name="notes"
-            rows={5}
-            defaultValue={initial.notes}
-            placeholder="Key insight, gotchas, why this approach works..."
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-          />
-        </label>
-        <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-          <label className="block text-sm">
-            <span className="mb-1 block text-muted">Code</span>
-            <textarea
-              name="codeSnippet"
-              rows={8}
-              defaultValue={initial.codeSnippet}
-              className="w-full rounded-md border border-border bg-background px-3 py-2 font-mono text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-            />
-          </label>
-          <label className="block text-sm">
-            <span className="mb-1 block text-muted">Language</span>
+          <label className="flex cursor-pointer items-center rounded-full border-[1.5px] border-dashed border-[#aaa] px-3 py-1 text-xs font-semibold text-muted">
+            + add tag
             <input
-              name="codeLanguage"
-              defaultValue={initial.codeLanguage ?? "python"}
-              className="w-28 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              name="customTags"
+              defaultValue={initial.customTags}
+              placeholder="tag1, tag2"
+              className="ml-1 w-24 bg-transparent text-xs text-foreground focus:outline-none"
+              onClick={(e) => e.stopPropagation()}
             />
           </label>
         </div>
-        <div className="grid gap-3 sm:grid-cols-4">
-          <label className="block text-sm">
-            <span className="mb-1 block text-muted">Time complexity</span>
+      </div>
+
+      {/* Notes */}
+      <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Notes</p>
+          <span className="text-[10px] text-[#aaa]">optional</span>
+        </div>
+        <textarea
+          name="notes"
+          rows={4}
+          defaultValue={initial.notes}
+          placeholder="Key insight, gotchas, approach..."
+          className={inputClass}
+        />
+      </div>
+
+      {/* Code */}
+      <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Code</p>
+          <input
+            name="codeLanguage"
+            defaultValue={initial.codeLanguage ?? "python"}
+            placeholder="language"
+            className="rounded border border-[#ccc] bg-background px-2 py-1 text-xs text-muted focus:outline-none"
+          />
+        </div>
+        <textarea
+          name="codeSnippet"
+          rows={6}
+          defaultValue={initial.codeSnippet}
+          className={`${inputClass} font-mono`}
+        />
+      </div>
+
+      {/* Complexity + timing */}
+      <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
+        <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">
+          Complexity &amp; Timing
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          <label className="block">
+            <span className="mb-1 block text-[10px] text-muted">Time</span>
             <input
               name="timeComplexity"
               defaultValue={initial.timeComplexity}
               placeholder="O(n)"
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              className={inputClass}
             />
           </label>
-          <label className="block text-sm">
-            <span className="mb-1 block text-muted">Space complexity</span>
+          <label className="block">
+            <span className="mb-1 block text-[10px] text-muted">Space</span>
             <input
               name="spaceComplexity"
               defaultValue={initial.spaceComplexity}
               placeholder="O(1)"
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              className={inputClass}
             />
           </label>
-          <label className="block text-sm">
-            <span className="mb-1 block text-muted">Time taken (min)</span>
+          <label className="block">
+            <span className="mb-1 block text-[10px] text-muted">Time taken (min)</span>
             <input
               type="number"
               min={0}
               name="timeTakenMinutes"
               defaultValue={initial.timeTakenMinutes}
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              className={inputClass}
             />
           </label>
-          <label className="block text-sm">
-            <span className="mb-1 block text-muted">Attempts</span>
+          <label className="block">
+            <span className="mb-1 block text-[10px] text-muted">Attempts</span>
             <input
               type="number"
               min={1}
               name="attemptsCount"
               defaultValue={initial.attemptsCount ?? "1"}
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              className={inputClass}
             />
           </label>
         </div>
-      </section>
+      </div>
 
+      {/* Status */}
+      <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
+        <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Status</p>
+        <input type="hidden" name="status" value={status} />
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setStatus("ACTIVE_REVIEW")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg border-[2.5px] border-foreground py-2.5 text-xs font-bold transition-colors ${
+              status === "ACTIVE_REVIEW"
+                ? "bg-foreground text-background"
+                : "bg-background text-foreground"
+            }`}
+          >
+            <div
+              className={`h-2 w-2 shrink-0 rounded-full ${
+                status === "ACTIVE_REVIEW" ? "bg-background" : "bg-foreground"
+              }`}
+            />
+            ACTIVE
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatus("MASTERED")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg border-[2.5px] border-foreground py-2.5 text-xs font-bold transition-colors ${
+              status === "MASTERED"
+                ? "bg-foreground text-background"
+                : "bg-background text-foreground"
+            }`}
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="none"
+              className="shrink-0"
+            >
+              <polyline
+                points="1.5,6 4.5,9.5 10.5,2.5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            MASTERED
+          </button>
+        </div>
+      </div>
+
+      {/* Submit */}
       <MotionButton
         type="submit"
-        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+        className="w-full rounded-xl border-[2.5px] border-foreground bg-foreground py-4 font-display text-[22px] tracking-[2.5px] text-background shadow-[3px_3px_0_#111]"
       >
-        {submitLabel}
+        {submitLabel.toUpperCase()}
       </MotionButton>
     </form>
   );

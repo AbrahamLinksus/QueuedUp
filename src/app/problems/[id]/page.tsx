@@ -30,15 +30,17 @@ export default async function ProblemDetailPage({
   const latestEntry = problem.entries[0];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-xl font-bold text-foreground">{problem.title}</h1>
+          <h1 className="font-display text-[42px] leading-[0.9] tracking-[2px] text-foreground">
+            {problem.title}
+          </h1>
           <a
             href={problem.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-accent hover:underline"
+            className="mt-1 block text-xs text-muted underline"
           >
             {problem.url}
           </a>
@@ -47,8 +49,8 @@ export default async function ProblemDetailPage({
       </div>
 
       {latestEntry && (latestEntry.notes || latestEntry.codeSnippet) && (
-        <section className="space-y-3 rounded-lg border border-border bg-surface p-4">
-          <h2 className="text-sm font-medium text-muted">Solution</h2>
+        <section className="space-y-3 rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
+          <h2 className="text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Solution</h2>
           {latestEntry.notes && <Markdown>{latestEntry.notes}</Markdown>}
           {latestEntry.codeSnippet && (
             <CodeBlock code={latestEntry.codeSnippet} language={latestEntry.codeLanguage} />
@@ -56,17 +58,22 @@ export default async function ProblemDetailPage({
         </section>
       )}
 
-      <section className="rounded-lg border border-border bg-surface p-4">
-        <h2 className="mb-2 text-sm font-medium text-muted">Review history</h2>
+      <section className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
+        <h2 className="mb-3 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">
+          Review history
+        </h2>
         {problem.reviews.length === 0 ? (
           <p className="text-sm text-muted">No reviews scheduled yet.</p>
         ) : (
-          <ul className="space-y-1 text-sm">
+          <ul className="space-y-1.5">
             {problem.reviews.map((review) => (
-              <li key={review.id} className="flex items-center justify-between text-muted">
+              <li
+                key={review.id}
+                className="flex items-center justify-between text-sm text-muted"
+              >
                 <span>Day +{review.dayOffset}</span>
                 <span>{review.scheduledFor.toLocaleDateString()}</span>
-                <span>{review.status}</span>
+                <span className="text-[11px]">{review.status}</span>
               </li>
             ))}
           </ul>
@@ -76,12 +83,13 @@ export default async function ProblemDetailPage({
       <ProblemForm
         action={updateProblem.bind(null, problem.id)}
         presetTags={presetTags}
-        submitLabel="Save changes"
+        submitLabel="Save Changes"
         initial={{
           title: problem.title,
           url: problem.url,
           platform: problem.platform,
           difficulty: problem.difficulty,
+          status: problem.status,
           tagIds: problem.tags.map((tag) => tag.id),
           notes: latestEntry?.notes,
           codeSnippet: latestEntry?.codeSnippet,

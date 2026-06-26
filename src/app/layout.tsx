@@ -1,23 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
+import { Bangers, DM_Sans } from "next/font/google";
 import { Nav } from "@/components/nav";
 import { PageTransition } from "@/components/page-transition";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const bangers = Bangers({
+  variable: "--font-bangers",
   subsets: ["latin"],
+  weight: "400",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["500", "700"],
 });
 
 export const metadata: Metadata = {
@@ -33,10 +28,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
+      className={`${bangers.variable} ${dmSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-32 pt-10">
+      <body className="min-h-full flex flex-col font-sans">
+        <main className="mx-auto w-full max-w-md flex-1 px-4 pb-32 pt-8">
           <PageTransition>{children}</PageTransition>
         </main>
         <Nav />

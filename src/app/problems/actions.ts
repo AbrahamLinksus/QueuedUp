@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { scheduleReviews } from "@/lib/reviews";
-import type { Difficulty, Platform } from "@/generated/prisma/client";
+import type { Difficulty, Platform, ProblemStatus } from "@/generated/prisma/client";
 
 async function resolveTagIds(formData: FormData) {
   const tagIds = formData.getAll("tagIds").map(String).filter(Boolean);
@@ -28,6 +28,7 @@ function readProblemFields(formData: FormData) {
     url: String(formData.get("url") ?? "").trim(),
     platform: String(formData.get("platform") ?? "OTHER") as Platform,
     difficulty: String(formData.get("difficulty") ?? "MEDIUM") as Difficulty,
+    status: String(formData.get("status") ?? "ACTIVE_REVIEW") as ProblemStatus,
   };
 }
 

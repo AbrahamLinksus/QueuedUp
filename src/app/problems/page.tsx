@@ -21,7 +21,7 @@ export default async function ProblemsPage({
   const [problems, tags] = await Promise.all([
     db.problem.findMany({
       where,
-      include: { tags: true },
+      include: { tags: true, _count: { select: { entries: true } } },
       orderBy: params.sort === "oldest" ? { createdAt: "asc" } : { createdAt: "desc" },
     }),
     db.tag.findMany({ orderBy: { name: "asc" } }),
@@ -31,11 +31,17 @@ export default async function ProblemsPage({
     problems.sort((a, b) => DIFFICULTY_RANK[a.difficulty] - DIFFICULTY_RANK[b.difficulty]);
   }
 
+  const mastered = problems.filter((p) => p.status === "MASTERED").length;
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-xl font-bold text-foreground">Problems</h1>
-        <span className="text-sm text-muted">{problems.length} logged</span>
+    <div className="space-y-3.5">
+      <div>
+        <h1 className="font-display text-[56px] leading-[0.9] tracking-[3px] text-foreground">
+          LOG
+        </h1>
+        <p className="mt-1.5 text-sm text-muted">
+          {problems.length} problem{problems.length !== 1 ? "s" : ""} · {mastered} mastered
+        </p>
       </div>
 
       <FilterBar tags={tags} />

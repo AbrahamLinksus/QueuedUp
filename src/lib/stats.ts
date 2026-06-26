@@ -84,9 +84,8 @@ export async function getDashboardStats() {
   const sevenDaysOut = new Date(endOfToday);
   sevenDaysOut.setDate(sevenDaysOut.getDate() + 7);
 
-  const [difficultyGroups, statusGroups, tags, entryDates, pendingReviews] = await Promise.all([
-    db.problem.groupBy({ by: ["difficulty"], _count: true }),
-    db.problem.groupBy({ by: ["status"], _count: true }),
+  const [allProblems, tags, entryDates, pendingReviews] = await Promise.all([
+    db.problem.findMany({ select: { difficulty: true, status: true } }),
     db.tag.findMany({
       include: { _count: { select: { problems: true } } },
       orderBy: { name: "asc" },
@@ -99,10 +98,11 @@ export async function getDashboardStats() {
   ]);
 
   const difficultyBreakdown = { EASY: 0, MEDIUM: 0, HARD: 0 } as Record<string, number>;
-  for (const group of difficultyGroups) difficultyBreakdown[group.difficulty] = group._count;
-
   const statusBreakdown = { ACTIVE_REVIEW: 0, MASTERED: 0 } as Record<string, number>;
-  for (const group of statusGroups) statusBreakdown[group.status] = group._count;
+  for (const p of allProblems) {
+    difficultyBreakdown[p.difficulty] = (difficultyBreakdown[p.difficulty] ?? 0) + 1;
+    statusBreakdown[p.status] = (statusBreakdown[p.status] ?? 0) + 1;
+  }
 
   const tagCoverage = tags
     .map((tag) => ({ name: tag.name, count: tag._count.problems }))

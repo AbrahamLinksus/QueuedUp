@@ -28,33 +28,65 @@ export default async function ReviewPage() {
   ]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-3.5">
       <div>
-        <h1 className="font-display text-xl font-bold text-foreground">Review</h1>
-        <p className="text-sm text-muted">
-          {dueReviews.length === 0
-            ? "Nothing due right now."
-            : `${dueReviews.length} review${dueReviews.length === 1 ? "" : "s"} due.`}
-        </p>
+        <h1 className="font-display text-[56px] leading-[0.9] tracking-[3px] text-foreground">
+          REVIEW
+        </h1>
+        <div className="mt-1.5 flex items-center gap-2">
+          {dueReviews.length > 0 ? (
+            <>
+              <div className="h-2 w-2 shrink-0 rounded-full bg-danger" />
+              <p className="text-sm font-medium text-foreground">
+                {dueReviews.length} review{dueReviews.length !== 1 ? "s" : ""} due
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-muted">Nothing due right now.</p>
+          )}
+        </div>
       </div>
 
-      <section className="space-y-2">
-        {dueReviews.map((review, index) => (
-          <DueReviewRow
-            key={review.id}
-            review={review}
-            isOverdue={review.scheduledFor < startOfToday}
-            index={index}
-          />
-        ))}
+      <section className="space-y-3">
+        {dueReviews.map((review, index) => {
+          const isOverdue = review.scheduledFor < startOfToday;
+          const daysAgo = isOverdue
+            ? Math.round(
+                (startOfToday.getTime() - review.scheduledFor.getTime()) / 86_400_000
+              )
+            : undefined;
+          return (
+            <DueReviewRow
+              key={review.id}
+              review={review}
+              isOverdue={isOverdue}
+              daysAgo={daysAgo}
+              index={index}
+            />
+          );
+        })}
       </section>
 
+      {dueReviews.length > 0 && (
+        <div className="flex items-center gap-3 py-1">
+          <div className="h-[1.5px] flex-1 bg-foreground opacity-10" />
+          <span className="text-xs text-muted">
+            all caught up after {dueReviews.length === 1 ? "this" : "these"} {dueReviews.length}
+          </span>
+          <div className="h-[1.5px] flex-1 bg-foreground opacity-10" />
+        </div>
+      )}
+
       {dueFlashcards.length > 0 && (
-        <section className="space-y-2">
-          <h2 className="text-sm font-medium text-muted">Flashcards</h2>
-          <p className="text-xs text-muted">
-            Mastered problems — a quick recall check, no need to re-solve.
-          </p>
+        <section className="space-y-3">
+          <div>
+            <h2 className="font-display text-[22px] tracking-[1.5px] text-foreground">
+              FLASHCARDS
+            </h2>
+            <p className="text-xs text-muted">
+              Mastered problems — a quick recall check, no need to re-solve.
+            </p>
+          </div>
           <div className="space-y-2">
             {dueFlashcards.map((problem, index) => (
               <FlashcardItem
@@ -69,22 +101,27 @@ export default async function ReviewPage() {
       )}
 
       {upcomingReviews.length > 0 && (
-        <section className="space-y-2">
-          <h2 className="text-sm font-medium text-muted">Upcoming</h2>
-          <ul className="space-y-1 text-sm">
-            {upcomingReviews.map((review) => (
-              <li
+        <section className="space-y-3">
+          <h2 className="font-display text-[22px] tracking-[1.5px] text-foreground">UPCOMING</h2>
+          <div className="overflow-hidden rounded-xl border-[2.5px] border-foreground bg-surface shadow-[3px_3px_0_#111]">
+            {upcomingReviews.map((review, i) => (
+              <div
                 key={review.id}
-                className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-muted"
+                className={`flex items-center justify-between px-4 py-3 text-sm ${
+                  i < upcomingReviews.length - 1 ? "border-b border-[#eee]" : ""
+                }`}
               >
-                <Link href={`/problems/${review.problem.id}`} className="hover:text-accent">
+                <Link
+                  href={`/problems/${review.problem.id}`}
+                  className="font-medium text-foreground hover:underline"
+                >
                   {review.problem.title}
                 </Link>
-                <span>Day +{review.dayOffset}</span>
-                <span>{review.scheduledFor.toLocaleDateString()}</span>
-              </li>
+                <span className="text-muted">Day +{review.dayOffset}</span>
+                <span className="text-muted">{review.scheduledFor.toLocaleDateString()}</span>
+              </div>
             ))}
-          </ul>
+          </div>
         </section>
       )}
     </div>

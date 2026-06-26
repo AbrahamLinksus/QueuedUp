@@ -14,7 +14,7 @@ export function DeleteButton({ action }: { action: () => void | Promise<void> })
     >
       <MotionButton
         type="submit"
-        className="rounded-md border border-danger/40 px-3 py-1.5 text-sm text-danger hover:bg-danger/10"
+        className="rounded-full border-2 border-danger px-3 py-1.5 text-xs font-semibold text-danger hover:bg-danger/10"
       >
         Delete
       </MotionButton>
