@@ -6,6 +6,7 @@ import { getCurrentUserId } from "@/lib/session";
 import { DueReviewRow } from "./due-review-row";
 import { FlashcardItem } from "./flashcard-item";
 import { ReviewCalendar } from "./review-calendar";
+import { PushSubscribeButton } from "@/components/push-subscribe";
 
 export default async function ReviewPage() {
   await connection();
@@ -76,6 +77,7 @@ export default async function ReviewPage() {
           ) : (
             <p className="text-sm text-muted">Nothing due right now.</p>
           )}
+          <PushSubscribeButton />
         </div>
       </div>
 
