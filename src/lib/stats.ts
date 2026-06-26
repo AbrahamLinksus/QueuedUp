@@ -78,9 +78,9 @@ function computeStreaks(activeDates: Set<string>, today: Date) {
   return { currentStreak, longestStreak: Math.max(longestStreak, currentStreak) };
 }
 
-export async function getDashboardStats() {
+export async function getDashboardStats(userId: string) {
   "use cache";
-  cacheTag("stats");
+  cacheTag(`stats:${userId}`);
   cacheLife("hours");
 
   const today = startOfDay(new Date());
@@ -90,14 +90,17 @@ export async function getDashboardStats() {
   sevenDaysOut.setDate(sevenDaysOut.getDate() + 7);
 
   const [allProblems, tags, entryDates, pendingReviews] = await Promise.all([
-    db.problem.findMany({ select: { difficulty: true, status: true } }),
+    db.problem.findMany({ where: { userId }, select: { difficulty: true, status: true } }),
     db.tag.findMany({
-      include: { _count: { select: { problems: true } } },
+      include: { _count: { select: { problems: { where: { userId } } } } },
       orderBy: { name: "asc" },
     }),
-    db.entry.findMany({ select: { createdAt: true } }),
+    db.entry.findMany({
+      where: { problem: { userId } },
+      select: { createdAt: true },
+    }),
     db.review.findMany({
-      where: { status: "PENDING" },
+      where: { status: "PENDING", problem: { userId } },
       select: { scheduledFor: true },
     }),
   ]);

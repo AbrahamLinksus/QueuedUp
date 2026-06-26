@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <circle cx="256" cy="256" r="256" fill="#111111"/>
+  <circle cx="256" cy="256" r="256" fill="#F5F1E8"/>
   <text
     x="256"
     y="330"
@@ -7,7 +7,7 @@
     font-size="240"
     font-weight="bold"
     font-style="italic"
-    fill="#F5F1E8"
+    fill="#111111"
     text-anchor="middle"
     dominant-baseline="auto"
     letter-spacing="-8"

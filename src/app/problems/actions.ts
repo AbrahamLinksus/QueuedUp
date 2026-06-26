@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { scheduleReviews } from "@/lib/reviews";
+import { getCurrentUserId } from "@/lib/session";
 import type { Difficulty, Platform, ProblemStatus } from "@/generated/prisma/client";
 
 async function resolveTagIds(formData: FormData) {
@@ -48,11 +49,12 @@ function readEntryFields(formData: FormData) {
 }
 
 export async function createProblem(formData: FormData) {
-  const tagIds = await resolveTagIds(formData);
+  const [tagIds, userId] = await Promise.all([resolveTagIds(formData), getCurrentUserId()]);
 
   const problem = await db.problem.create({
     data: {
       ...readProblemFields(formData),
+      userId,
       tags: { connect: tagIds.map((id) => ({ id })) },
       entries: { create: readEntryFields(formData) },
     },
@@ -61,21 +63,21 @@ export async function createProblem(formData: FormData) {
   await scheduleReviews(problem.id, problem.createdAt);
 
   revalidatePath("/problems");
-  revalidateTag("stats", "max");
+  revalidateTag(`stats:${userId}`, "max");
   revalidateTag("tags", "max");
   redirect("/problems");
 }
 
 export async function updateProblem(problemId: string, formData: FormData) {
-  const tagIds = await resolveTagIds(formData);
+  const [tagIds, userId] = await Promise.all([resolveTagIds(formData), getCurrentUserId()]);
 
   const latestEntry = await db.entry.findFirst({
-    where: { problemId },
+    where: { problemId, problem: { userId } },
     orderBy: { createdAt: "desc" },
   });
 
   await db.problem.update({
-    where: { id: problemId },
+    where: { id: problemId, userId },
     data: {
       ...readProblemFields(formData),
       tags: { set: tagIds.map((id) => ({ id })) },
@@ -87,15 +89,16 @@ export async function updateProblem(problemId: string, formData: FormData) {
 
   revalidatePath("/problems");
   revalidatePath(`/problems/${problemId}`);
-  revalidateTag("stats", "max");
+  revalidateTag(`stats:${userId}`, "max");
   redirect("/problems");
 }
 
 export async function deleteProblem(problemId: string) {
-  await db.problem.delete({ where: { id: problemId } });
+  const userId = await getCurrentUserId();
+  await db.problem.delete({ where: { id: problemId, userId } });
 
   revalidatePath("/problems");
-  revalidateTag("stats", "max");
+  revalidateTag(`stats:${userId}`, "max");
   redirect("/problems");
 }
 

@@ -1,5 +1,6 @@
 import { connection } from "next/server";
 import { getDashboardStats } from "@/lib/stats";
+import { getCurrentUserId } from "@/lib/session";
 import { Heatmap } from "@/components/heatmap";
 import { StatCard } from "@/components/stat-card";
 
@@ -120,7 +121,8 @@ function Stickman({ quote }: { quote: string }) {
 
 export default async function Home() {
   await connection();
-  const stats = await getDashboardStats();
+  const userId = await getCurrentUserId();
+  const stats = await getDashboardStats(userId);
   const today = new Date();
   const dateStr = today.toLocaleDateString("en-US", {
     weekday: "long",

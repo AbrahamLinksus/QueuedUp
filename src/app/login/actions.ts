@@ -2,17 +2,21 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { AUTH_COOKIE_NAME, getSessionToken, isValidPasscode } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { AUTH_COOKIE_NAME, createSessionToken, verifyPassword } from "@/lib/auth";
 
 export async function login(formData: FormData) {
-  const passcode = String(formData.get("passcode") ?? "");
+  const username = String(formData.get("username") ?? "").trim().toLowerCase();
+  const password = String(formData.get("password") ?? "");
 
-  if (!isValidPasscode(passcode)) {
+  const user = await db.user.findUnique({ where: { username } });
+
+  if (!user || !(await verifyPassword(password, user.passwordHash))) {
     redirect("/login?error=1");
   }
 
   const cookieStore = await cookies();
-  cookieStore.set(AUTH_COOKIE_NAME, getSessionToken(), {
+  cookieStore.set(AUTH_COOKIE_NAME, createSessionToken(user.id), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -21,4 +25,10 @@ export async function login(formData: FormData) {
   });
 
   redirect("/");
+}
+
+export async function logout() {
+  const cookieStore = await cookies();
+  cookieStore.delete(AUTH_COOKIE_NAME);
+  redirect("/login");
 }

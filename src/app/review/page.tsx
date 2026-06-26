@@ -2,11 +2,14 @@ import { connection } from "next/server";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getDueFlashcards } from "@/lib/flashcards";
+import { getCurrentUserId } from "@/lib/session";
 import { DueReviewRow } from "./due-review-row";
 import { FlashcardItem } from "./flashcard-item";
 
 export default async function ReviewPage() {
   await connection();
+  const userId = await getCurrentUserId();
+
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
   const endOfToday = new Date(startOfToday);
@@ -14,17 +17,17 @@ export default async function ReviewPage() {
 
   const [dueReviews, upcomingReviews, dueFlashcards] = await Promise.all([
     db.review.findMany({
-      where: { status: "PENDING", scheduledFor: { lte: endOfToday } },
+      where: { status: "PENDING", scheduledFor: { lte: endOfToday }, problem: { userId } },
       include: { problem: true },
       orderBy: { scheduledFor: "asc" },
     }),
     db.review.findMany({
-      where: { status: "PENDING", scheduledFor: { gt: endOfToday } },
+      where: { status: "PENDING", scheduledFor: { gt: endOfToday }, problem: { userId } },
       include: { problem: true },
       orderBy: { scheduledFor: "asc" },
       take: 10,
     }),
-    getDueFlashcards(),
+    getDueFlashcards(userId),
   ]);
 
   return (

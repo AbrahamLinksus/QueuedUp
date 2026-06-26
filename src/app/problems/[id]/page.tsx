@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import { getCurrentUserId } from "@/lib/session";
 import { Markdown } from "@/components/markdown";
 import { CodeBlock } from "@/components/code-block";
 import { ProblemForm } from "../problem-form";
@@ -11,11 +12,11 @@ export default async function ProblemDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
+  const [{ id }, userId] = await Promise.all([params, getCurrentUserId()]);
 
   const [problem, presetTags] = await Promise.all([
     db.problem.findUnique({
-      where: { id },
+      where: { id, userId },
       include: {
         tags: true,
         entries: { orderBy: { createdAt: "desc" } },

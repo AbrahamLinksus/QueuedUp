@@ -29,6 +29,14 @@ enum ReviewStatus {
   SKIPPED
 }
 
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  problems     Problem[]
+}
+
 model Problem {
   id         String        @id @default(cuid())
   title      String
@@ -37,7 +45,9 @@ model Problem {
   difficulty Difficulty
   status     ProblemStatus @default(ACTIVE_REVIEW)
   createdAt  DateTime      @default(now())
+  userId     String
 
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   tags             Tag[]
   entries          Entry[]
   reviews          Review[]

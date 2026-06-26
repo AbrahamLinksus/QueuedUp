@@ -1,6 +1,7 @@
 import { cacheTag, cacheLife } from "next/cache";
 import { db } from "@/lib/db";
 import type { Prisma } from "@/generated/prisma/client";
+import { getCurrentUserId } from "@/lib/session";
 import { FilterBar } from "./filter-bar";
 import { ProblemsCardGrid } from "./problems-card-grid";
 
@@ -18,9 +19,9 @@ export default async function ProblemsPage({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-  const params = await searchParams;
+  const [params, userId] = await Promise.all([searchParams, getCurrentUserId()]);
 
-  const where: Prisma.ProblemWhereInput = {};
+  const where: Prisma.ProblemWhereInput = { userId };
   if (params.difficulty) where.difficulty = params.difficulty as never;
   if (params.status) where.status = params.status as never;
   if (params.platform) where.platform = params.platform as never;

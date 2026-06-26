@@ -3,9 +3,10 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { db } from "@/lib/db";
 import { FINAL_REVIEW_DAY_OFFSET } from "@/lib/reviews";
+import { getCurrentUserId } from "@/lib/session";
 
 export async function completeReview(reviewId: string, outcome: "DONE" | "SKIPPED", formData: FormData) {
-  const notes = String(formData.get("notes") ?? "").trim();
+  const [notes, userId] = [String(formData.get("notes") ?? "").trim(), await getCurrentUserId()];
 
   const review = await db.review.update({
     where: { id: reviewId },
@@ -24,7 +25,6 @@ export async function completeReview(reviewId: string, outcome: "DONE" | "SKIPPE
       data: { status: "MASTERED" },
     });
 
-    // Any earlier checkpoints that were never acted on no longer matter once mastered.
     await db.review.updateMany({
       where: { problemId: review.problemId, status: "PENDING" },
       data: { status: "SKIPPED", completedAt: new Date() },
@@ -34,7 +34,7 @@ export async function completeReview(reviewId: string, outcome: "DONE" | "SKIPPE
   revalidatePath("/review");
   revalidatePath("/");
   revalidatePath(`/problems/${review.problemId}`);
-  revalidateTag("stats", "max");
+  revalidateTag(`stats:${userId}`, "max");
 }
 
 export async function reviewFlashcard(problemId: string, recalledOk: boolean) {

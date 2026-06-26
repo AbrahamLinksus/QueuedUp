@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
+import { logout } from "@/app/login/actions";
 
 const links = [
   { href: "/", label: "Dashboard" },
@@ -13,7 +14,7 @@ const links = [
 export function Nav() {
   const pathname = usePathname();
 
-  if (pathname === "/login") return null;
+  if (pathname === "/login" || pathname === "/register") return null;
 
   return (
     <motion.div
@@ -56,6 +57,16 @@ export function Nav() {
         >
           + New
         </Link>
+
+        <form action={logout}>
+          <button
+            type="submit"
+            className="rounded-full px-3 py-[7px] text-[12px] text-white/40 transition-colors hover:text-white/70 whitespace-nowrap"
+            title="Sign out"
+          >
+            ⎋
+          </button>
+        </form>
       </div>
     </motion.div>
   );
