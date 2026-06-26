@@ -14,7 +14,7 @@ export async function completeReview(reviewId: string, outcome: "DONE" | "SKIPPE
 
   if (outcome === "DONE" && notes) {
     await db.entry.create({
-      data: { problemId: review.problemId, notes },
+      data: { problemId: review.problemId, notes, codeSnippet: "" },
     });
   }
 
