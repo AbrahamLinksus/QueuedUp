@@ -4,11 +4,19 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { db } from "@/lib/db";
 import { FINAL_REVIEW_DAY_OFFSET } from "@/lib/reviews";
 
-export async function completeReview(reviewId: string, outcome: "DONE" | "SKIPPED") {
+export async function completeReview(reviewId: string, outcome: "DONE" | "SKIPPED", formData: FormData) {
+  const notes = String(formData.get("notes") ?? "").trim();
+
   const review = await db.review.update({
     where: { id: reviewId },
     data: { status: outcome, completedAt: new Date() },
   });
+
+  if (outcome === "DONE" && notes) {
+    await db.entry.create({
+      data: { problemId: review.problemId, notes },
+    });
+  }
 
   if (review.dayOffset === FINAL_REVIEW_DAY_OFFSET) {
     await db.problem.update({

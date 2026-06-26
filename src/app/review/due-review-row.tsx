@@ -77,8 +77,14 @@ export function DueReviewRow({
             {review.problem.title}
           </Link>
           <DifficultyBadge difficulty={review.problem.difficulty} />
-          <div className="mt-1 flex gap-2">
-            <form action={completeReview.bind(null, review.id, "DONE")} className="flex-1">
+          <div className="mt-1 space-y-2">
+            <form action={completeReview.bind(null, review.id, "DONE")} className="space-y-2">
+              <textarea
+                name="notes"
+                rows={2}
+                placeholder="Any new insight or approach? (optional)"
+                className="w-full resize-none rounded-lg border-2 border-[#ddd] bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted focus:border-foreground focus:outline-none"
+              />
               <MotionButton
                 type="submit"
                 className="w-full rounded-lg border-[2.5px] border-foreground bg-foreground py-2 text-xs font-bold tracking-[0.3px] text-background"
@@ -86,7 +92,7 @@ export function DueReviewRow({
                 SOLVED
               </MotionButton>
             </form>
-            <form action={completeReview.bind(null, review.id, "SKIPPED")} className="flex-1">
+            <form action={completeReview.bind(null, review.id, "SKIPPED")}>
               <MotionButton
                 type="submit"
                 className="w-full rounded-lg border-[2.5px] border-foreground bg-background py-2 text-xs font-semibold text-foreground"

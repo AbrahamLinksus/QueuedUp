@@ -63,7 +63,40 @@ function DifficultyBar({ breakdown }: { breakdown: Record<string, number> }) {
   );
 }
 
-function Stickman() {
+const STREAK_QUOTES = [
+  "NICE STREAK!",
+  "JUST KEEP SOLVING!",
+  "TO INFINITY AND O(1)!",
+  "HAKUNA MATATA, JUST MEMOIZE!",
+  "WITH GREAT POWER COMES O(N²)",
+  "YOU SHALL NOT PASS... THE WRONG ANSWER!",
+  "WHY SO RECURSIVE?",
+  "I AM INEVITABLE... UNLESS MEMOIZED!",
+  "NOBODY PUTS BINARY SEARCH IN A CORNER!",
+  "HOUSTON, WE HAVE A SOLUTION!",
+  "I'LL BE BACK... AFTER O(LOG N) STEPS!",
+  "THE STACK IS STRONG WITH THIS ONE!",
+  "ELEMENTARY, MY DEAR ALGORITHM!",
+  "LIFE IS LIKE A HASH MAP — YOU NEVER KNOW WHAT YOU'LL GET!",
+  "ONE DOES NOT SIMPLY BRUTE FORCE!",
+  "THIS IS THE WAY... TO O(1)!",
+  "I SEE DEAD CODE... EVERYWHERE!",
+  "WHY SO RECURSIVE?",
+  "SUPERCALIFRAGILISTIC-EXPIALIDO-O(N)!",
+  "YIPPEE-KI-YAY, MERGE SORT!",
+  "IT'S DANGEROUS TO GO ALONE — TAKE MEMOIZATION!",
+  "KEEP GOING, LEGEND!",
+  "BUGS FEAR YOUR NAME!",
+  "STACK OVERFLOW? NEVER HEARD OF IT!",
+  "THE GRIND NEVER STOPS!",
+  "INTERVIEW SZEASON? BRING IT!",
+  "ANOTHER DAY, ANOTHER ALGORITHM!",
+  "YOU'RE ON FIRE! (BIG O OF AWESOME)",
+  "WHO'S THE GOAT? YOU ARE!",
+  "SLIDING WINDOW TO THE TOP!",
+];
+
+function Stickman({ quote }: { quote: string }) {
   return (
     <div className="flex items-end gap-3 px-1">
       <div className="shrink-0" style={{ animation: "bob 1.7s ease-in-out infinite" }}>
@@ -77,7 +110,7 @@ function Stickman() {
         </svg>
       </div>
       <div className="relative mb-2.5 flex-1 rounded-[14px] border-[2.5px] border-foreground bg-surface px-4 py-2.5">
-        <p className="font-display text-xl tracking-[1.5px] text-foreground">NICE STREAK!</p>
+        <p className="font-display text-xl tracking-[1.5px] text-foreground">{quote}</p>
         <span className="absolute -left-[14px] top-1/2 -translate-y-1/2 border-b-[9px] border-r-[14px] border-t-[9px] border-b-transparent border-r-foreground border-t-transparent" />
         <span className="absolute -left-[10px] top-1/2 -translate-y-1/2 border-b-[7px] border-r-[10px] border-t-[7px] border-b-transparent border-r-surface border-t-transparent" />
       </div>
@@ -149,7 +182,7 @@ export default async function Home() {
         {/* Stickman — right col, row 2 on desktop */}
         {stats.currentStreak > 0 && (
           <div className="md:col-start-2 md:row-start-2">
-            <Stickman />
+            <Stickman quote={STREAK_QUOTES[Math.floor(Math.random() * STREAK_QUOTES.length)]} />
           </div>
         )}
       </div>
