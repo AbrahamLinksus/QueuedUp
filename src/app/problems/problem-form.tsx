@@ -55,6 +55,10 @@ export function ProblemForm({
   const [difficulty, setDifficulty] = useState(initial.difficulty ?? "MEDIUM");
   const [status, setStatus] = useState(initial.status ?? "ACTIVE_REVIEW");
   const [autofillStatus, setAutofillStatus] = useState<{ ok: boolean; rateLimited?: boolean; msg: string } | null>(null);
+  const [showCode, setShowCode] = useState(!!initial.codeSnippet);
+  const [showComplexity, setShowComplexity] = useState(
+    !!(initial.timeComplexity || initial.spaceComplexity || initial.timeTakenMinutes)
+  );
   const [isPending, startTransition] = useTransition();
 
   const inputClass =
@@ -85,11 +89,6 @@ export function ProblemForm({
         Desktop two-column grid:
           Left col  = problem metadata (title, difficulty, tags, status)
           Right col = entry data (notes, code, complexity+timing)
-
-        Mobile (space-y-3.5, no grid): cards stack in DOM order →
-          Title+URL, Difficulty, Tags, Notes, Code, Complexity, Status.
-        Desktop (md:grid md:grid-cols-2 md:gap-4): explicit col/row placement
-          rearranges cards into two columns; md:space-y-0 removes mobile margins.
       */}
       <div className="space-y-3.5 md:grid md:grid-cols-2 md:items-start md:gap-4 md:space-y-0">
 
@@ -183,103 +182,16 @@ export function ProblemForm({
                 {tag.name}
               </label>
             ))}
-            <label className="flex cursor-pointer items-center rounded-full border-[1.5px] border-dashed border-[#aaa] px-3 py-1 text-xs font-semibold text-muted">
-              + add tag
-              <input
-                name="customTags"
-                defaultValue={initial.customTags}
-                placeholder="tag1, tag2"
-                className="ml-1 w-24 bg-transparent text-xs text-foreground focus:outline-none"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </label>
           </div>
-        </div>
-
-        {/* ── RIGHT COLUMN ─────────────────────────────────────── */}
-
-        {/* Notes — right col, row 1 */}
-        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-2 md:row-start-1">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Notes</p>
-            <span className="text-[10px] text-[#aaa]">optional</span>
-          </div>
-          <textarea
-            name="notes"
-            rows={4}
-            defaultValue={initial.notes}
-            placeholder="Key insight, gotchas, approach..."
-            className={inputClass}
+          <input
+            name="customTags"
+            defaultValue={initial.customTags}
+            placeholder="Custom tags, comma-separated…"
+            className="mt-2.5 w-full rounded-lg border-[1.5px] border-dashed border-[#bbb] bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted focus:border-foreground focus:outline-none"
           />
         </div>
 
-        {/* Code — right col, row 2 */}
-        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-2 md:row-start-2">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Code</p>
-            <input
-              name="codeLanguage"
-              defaultValue={initial.codeLanguage ?? "python"}
-              placeholder="language"
-              className="rounded border border-[#ccc] bg-background px-2 py-1 text-xs text-muted focus:outline-none"
-            />
-          </div>
-          <textarea
-            name="codeSnippet"
-            rows={6}
-            defaultValue={initial.codeSnippet}
-            className={`${inputClass} font-mono`}
-          />
-        </div>
-
-        {/* Complexity + timing — right col, row 3 */}
-        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-2 md:row-start-3">
-          <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">
-            Complexity &amp; Timing
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            <label className="block">
-              <span className="mb-1 block text-[10px] text-muted">Time</span>
-              <input
-                name="timeComplexity"
-                defaultValue={initial.timeComplexity}
-                placeholder="O(n)"
-                className={inputClass}
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 block text-[10px] text-muted">Space</span>
-              <input
-                name="spaceComplexity"
-                defaultValue={initial.spaceComplexity}
-                placeholder="O(1)"
-                className={inputClass}
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 block text-[10px] text-muted">Time taken (min)</span>
-              <input
-                type="number"
-                min={0}
-                name="timeTakenMinutes"
-                defaultValue={initial.timeTakenMinutes}
-                className={inputClass}
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 block text-[10px] text-muted">Attempts</span>
-              <input
-                type="number"
-                min={1}
-                name="attemptsCount"
-                defaultValue={initial.attemptsCount ?? "1"}
-                className={inputClass}
-              />
-            </label>
-          </div>
-        </div>
-
-        {/* Status — left col, row 4 on desktop; last before submit on mobile */}
+        {/* Status — left col, row 4 on desktop */}
         <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-1 md:row-start-4">
           <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Status</p>
           <input type="hidden" name="status" value={status} />
@@ -309,13 +221,7 @@ export function ProblemForm({
                   : "bg-background text-foreground"
               }`}
             >
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 12 12"
-                fill="none"
-                className="shrink-0"
-              >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0">
                 <polyline
                   points="1.5,6 4.5,9.5 10.5,2.5"
                   stroke="currentColor"
@@ -327,6 +233,131 @@ export function ProblemForm({
               MASTERED
             </button>
           </div>
+        </div>
+
+        {/* ── RIGHT COLUMN ─────────────────────────────────────── */}
+
+        {/* Notes — right col, row 1 */}
+        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-2 md:row-start-1">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Notes</p>
+            <span className="text-[10px] text-[#aaa]">optional</span>
+          </div>
+          <textarea
+            name="notes"
+            rows={4}
+            defaultValue={initial.notes}
+            placeholder="Key insight, gotchas, approach..."
+            className={inputClass}
+          />
+        </div>
+
+        {/* Code — right col, row 2 — collapsible */}
+        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-2 md:row-start-2">
+          <div className="flex items-center justify-between">
+            <p className="text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Code</p>
+            {showCode ? (
+              <button
+                type="button"
+                onClick={() => setShowCode(false)}
+                className="text-[10px] text-muted hover:text-foreground"
+              >
+                ✕ remove
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowCode(true)}
+                className="rounded border border-dashed border-[#bbb] px-2 py-0.5 text-[10px] text-muted hover:border-foreground hover:text-foreground"
+              >
+                + add
+              </button>
+            )}
+          </div>
+          {showCode && (
+            <div className="mt-2 space-y-2">
+              <input
+                name="codeLanguage"
+                defaultValue={initial.codeLanguage ?? "python"}
+                placeholder="language"
+                className="rounded border border-[#ccc] bg-background px-2 py-1 text-xs text-muted focus:outline-none"
+              />
+              <textarea
+                name="codeSnippet"
+                rows={6}
+                defaultValue={initial.codeSnippet}
+                className={`${inputClass} font-mono`}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Complexity + timing — right col, row 3 — collapsible */}
+        <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111] md:col-start-2 md:row-start-3">
+          <div className="flex items-center justify-between">
+            <p className="text-[9px] font-bold uppercase tracking-[0.9px] text-muted">
+              Complexity &amp; Timing
+            </p>
+            {showComplexity ? (
+              <button
+                type="button"
+                onClick={() => setShowComplexity(false)}
+                className="text-[10px] text-muted hover:text-foreground"
+              >
+                ✕ remove
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowComplexity(true)}
+                className="rounded border border-dashed border-[#bbb] px-2 py-0.5 text-[10px] text-muted hover:border-foreground hover:text-foreground"
+              >
+                + add
+              </button>
+            )}
+          </div>
+          {showComplexity && (
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <label className="block">
+                <span className="mb-1 block text-[10px] text-muted">Time</span>
+                <input
+                  name="timeComplexity"
+                  defaultValue={initial.timeComplexity}
+                  placeholder="O(n)"
+                  className={inputClass}
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-[10px] text-muted">Space</span>
+                <input
+                  name="spaceComplexity"
+                  defaultValue={initial.spaceComplexity}
+                  placeholder="O(1)"
+                  className={inputClass}
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-[10px] text-muted">Time taken (min)</span>
+                <input
+                  type="number"
+                  min={0}
+                  name="timeTakenMinutes"
+                  defaultValue={initial.timeTakenMinutes}
+                  className={inputClass}
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-[10px] text-muted">Attempts</span>
+                <input
+                  type="number"
+                  min={1}
+                  name="attemptsCount"
+                  defaultValue={initial.attemptsCount ?? "1"}
+                  className={inputClass}
+                />
+              </label>
+            </div>
+          )}
         </div>
 
       </div>
