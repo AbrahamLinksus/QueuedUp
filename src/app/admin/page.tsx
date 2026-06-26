@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUserId } from "@/lib/session";
 import { getMainTopicsForTags } from "@/lib/topics";
+import { DeleteUserButton } from "./delete-user-button";
 
 const OWNER_USERNAME = (process.env.OWNER_USERNAME ?? "jake").toLowerCase();
 
@@ -164,7 +165,7 @@ export default async function AdminPage() {
                   {" · "}last active {relativeDate(u.lastActive)}
                 </p>
               </div>
-              <div className="flex flex-col items-end gap-1">
+              <div className="flex flex-col items-end gap-2">
                 {u.currentStreak > 0 && (
                   <div className="flex items-center gap-1 rounded-full border-[2px] border-foreground px-3 py-1">
                     <span className="font-display text-[18px] leading-none text-foreground">{u.currentStreak}</span>
@@ -173,6 +174,9 @@ export default async function AdminPage() {
                 )}
                 {u.longestStreak > u.currentStreak && (
                   <p className="text-[10px] text-muted">best: {u.longestStreak} days</p>
+                )}
+                {u.username.toLowerCase() !== OWNER_USERNAME && (
+                  <DeleteUserButton username={u.username} />
                 )}
               </div>
             </div>
