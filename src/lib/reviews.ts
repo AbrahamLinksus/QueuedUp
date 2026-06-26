@@ -1,9 +1,8 @@
 import { db } from "@/lib/db";
 
-// Gaps between reviews: 2, 3, 4, 5, 6, 7 days (capped at 7).
-// Cumulative days from creation: 2, 5, 9, 14, 20, 27.
-// Completing the 27-day review earns MASTERED.
-export const REVIEW_DAY_OFFSETS = [2, 5, 9, 14, 20, 27] as const;
+// Gaps: +2, +3, +4, then final jump to +7 threshold.
+// Cumulative from creation: day 2, day 5, day 9, day 16 → MASTERED.
+export const REVIEW_DAY_OFFSETS = [2, 5, 9, 16] as const;
 export const FINAL_REVIEW_DAY_OFFSET = REVIEW_DAY_OFFSETS[REVIEW_DAY_OFFSETS.length - 1];
 
 export async function scheduleReviews(problemId: string, solvedAt: Date) {

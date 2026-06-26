@@ -2,6 +2,7 @@ import { cacheTag, cacheLife } from "next/cache";
 import { db } from "@/lib/db";
 import type { Prisma } from "@/generated/prisma/client";
 import { getCurrentUserId } from "@/lib/session";
+import { MAIN_TOPICS, getMainTopicsForTags } from "@/lib/topics";
 import { FilterBar } from "./filter-bar";
 import { ProblemsCardGrid } from "./problems-card-grid";
 
@@ -27,19 +28,33 @@ export default async function ProblemsPage({
   if (params.platform) where.platform = params.platform as never;
   if (params.tag) where.tags = { some: { id: params.tag } };
 
-  const [problems, tags, topicCounts] = await Promise.all([
+  const [problems, tags, allProblemsForTopics] = await Promise.all([
     db.problem.findMany({
       where,
       include: { tags: true, _count: { select: { entries: true } } },
       orderBy: params.sort === "oldest" ? { createdAt: "asc" } : { createdAt: "desc" },
     }),
     getCachedTags(),
-    db.tag.findMany({
-      where: { problems: { some: { userId } } },
-      include: { _count: { select: { problems: { where: { userId } } } } },
-      orderBy: { name: "asc" },
+    db.problem.findMany({
+      where: { userId },
+      select: { tags: { select: { name: true } } },
     }),
   ]);
+
+  // Count problems per main topic — each problem counts at most once per topic.
+  const topicCountMap = new Map<string, number>();
+  for (const p of allProblemsForTopics) {
+    const mainTopics = getMainTopicsForTags(p.tags.map((t) => t.name));
+    for (const topic of mainTopics) {
+      topicCountMap.set(topic, (topicCountMap.get(topic) ?? 0) + 1);
+    }
+  }
+  const topicRows = MAIN_TOPICS
+    .map((t) => ({ name: t, count: topicCountMap.get(t) ?? 0 }))
+    .filter((t) => t.count > 0)
+    .sort((a, b) => b.count - a.count);
+
+  const maxTopicCount = topicRows[0]?.count ?? 1;
 
   if (params.sort === "difficulty") {
     problems.sort((a, b) => DIFFICULTY_RANK[a.difficulty] - DIFFICULTY_RANK[b.difficulty]);
@@ -76,22 +91,26 @@ export default async function ProblemsPage({
             <FilterBar tags={tags} />
           </div>
 
-          {topicCounts.length > 0 && (
+          {topicRows.length > 0 && (
             <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-4 shadow-[3px_3px_0_#111]">
               <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">
                 Topics
               </p>
-              <div className="space-y-1.5">
-                {topicCounts.map((tag) => (
-                  <div key={tag.id} className="flex items-center justify-between">
-                    <span className="text-xs text-foreground">{tag.name}</span>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="h-1.5 rounded-full bg-foreground"
-                        style={{ width: `${Math.max(8, (tag._count.problems / problems.length) * 80)}px` }}
-                      />
-                      <span className="w-4 text-right text-xs font-semibold text-foreground">
-                        {tag._count.problems}
+              <div className="space-y-2">
+                {topicRows.map((topic) => (
+                  <div key={topic.name} className="flex items-center gap-2">
+                    <span className="w-28 shrink-0 text-[11px] capitalize text-foreground">
+                      {topic.name}
+                    </span>
+                    <div className="flex flex-1 items-center gap-1.5">
+                      <div className="flex-1 overflow-hidden rounded-full bg-foreground/10">
+                        <div
+                          className="h-1.5 rounded-full bg-foreground transition-all"
+                          style={{ width: `${(topic.count / maxTopicCount) * 100}%` }}
+                        />
+                      </div>
+                      <span className="w-5 shrink-0 text-right text-[11px] font-semibold text-foreground">
+                        {topic.count}
                       </span>
                     </div>
                   </div>
