@@ -64,15 +64,17 @@ export default async function AdminPage() {
 
   const users = await db.user.findMany({
     orderBy: { createdAt: "asc" },
-    include: {
+    select: {
+      username: true,
+      createdAt: true,
       problems: {
-        include: {
-          reviews: { where: { status: "DONE" }, select: { completedAt: true } },
-        },
         select: {
           status: true,
           createdAt: true,
-          reviews: true,
+          reviews: {
+            where: { status: "DONE" },
+            select: { completedAt: true },
+          },
         },
       },
     },
