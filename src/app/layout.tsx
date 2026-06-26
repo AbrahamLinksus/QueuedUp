@@ -19,6 +19,15 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "QueuedUp",
   description: "Personal DSA practice journal with spaced-repetition review.",
+  icons: {
+    icon: "/favicon-32.png",
+    apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "QueuedUp",
+    statusBarStyle: "black-translucent",
+  },
 };
 
 export default function RootLayout({
@@ -32,6 +41,7 @@ export default function RootLayout({
       className={`${bangers.variable} ${dmSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
+        <script dangerouslySetInnerHTML={{ __html: `if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js')` }} />
         <main className="mx-auto w-full max-w-md md:max-w-5xl flex-1 px-4 md:px-8 pb-32 pt-8">
           <PageTransition>{children}</PageTransition>
         </main>
