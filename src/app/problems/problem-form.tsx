@@ -41,11 +41,13 @@ export function ProblemForm({
   presetTags,
   initial = {},
   submitLabel,
+  singleColumn = false,
 }: {
   action: (formData: FormData) => void | Promise<void>;
   presetTags: PresetTag[];
   initial?: ProblemFormInitial;
   submitLabel: string;
+  singleColumn?: boolean;
 }) {
   const selectedTagIds = new Set(initial.tagIds ?? []);
 
@@ -90,7 +92,7 @@ export function ProblemForm({
           Left col  = problem metadata (title, difficulty, tags, status)
           Right col = entry data (notes, code, complexity+timing)
       */}
-      <div className="space-y-3.5 md:grid md:grid-cols-2 md:items-start md:gap-4 md:space-y-0">
+      <div className={singleColumn ? "space-y-3.5" : "space-y-3.5 md:grid md:grid-cols-2 md:items-start md:gap-4 md:space-y-0"}>
 
         {/* ── LEFT COLUMN ──────────────────────────────────────── */}
 

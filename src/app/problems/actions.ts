@@ -63,7 +63,7 @@ export async function createProblem(formData: FormData) {
   revalidatePath("/problems");
   revalidateTag("stats", "max");
   revalidateTag("tags", "max");
-  redirect(`/problems/${problem.id}`);
+  redirect("/problems");
 }
 
 export async function updateProblem(problemId: string, formData: FormData) {
@@ -88,7 +88,7 @@ export async function updateProblem(problemId: string, formData: FormData) {
   revalidatePath("/problems");
   revalidatePath(`/problems/${problemId}`);
   revalidateTag("stats", "max");
-  redirect(`/problems/${problemId}`);
+  redirect("/problems");
 }
 
 export async function deleteProblem(problemId: string) {
