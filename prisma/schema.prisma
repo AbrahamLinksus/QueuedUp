@@ -96,6 +96,15 @@ model Review {
   @@index([scheduledFor, status])
 }
 
+model SheetProblem {
+  id         String @id @default(cuid())
+  title      String
+  url        String @unique
+  difficulty String
+  topic      String
+  order      Int    @unique
+}
+
 model FlashcardReview {
   id         String   @id @default(cuid())
   problemId  String

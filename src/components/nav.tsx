@@ -7,6 +7,7 @@ import { logout } from "@/app/login/actions";
 
 const links = [
   { href: "/review", label: "Review" },
+  { href: "/sheets", label: "Sheet" },
   { href: "/problems", label: "Log" },
 ];
 

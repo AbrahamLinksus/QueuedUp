@@ -5,9 +5,9 @@ import { login } from "./actions";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; registered?: string }>;
+  searchParams: Promise<{ error?: string; registered?: string; reset?: string }>;
 }) {
-  const { error, registered } = await searchParams;
+  const { error, registered, reset } = await searchParams;
 
   return (
     <div className="mx-auto mt-16 max-w-sm space-y-8">
@@ -36,6 +36,7 @@ export default async function LoginPage({
           className="w-full rounded-xl border-[2.5px] border-foreground bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted shadow-[3px_3px_0_#111] focus:outline-none"
         />
         {registered && <p className="text-sm text-foreground font-medium">Account created — sign in below.</p>}
+        {reset && <p className="text-sm text-foreground font-medium">Password updated — sign in with your new password.</p>}
         {error && <p className="text-sm text-danger">Incorrect username or password.</p>}
         <MotionButton
           type="submit"
@@ -44,12 +45,20 @@ export default async function LoginPage({
           SIGN IN
         </MotionButton>
       </form>
-      <p className="text-center text-sm text-muted">
-        No account?{" "}
-        <Link href="/register" className="font-semibold text-foreground underline">
-          Register
-        </Link>
-      </p>
+      <div className="space-y-2 text-center text-sm text-muted">
+        <p>
+          No account?{" "}
+          <Link href="/register" className="font-semibold text-foreground underline">
+            Register
+          </Link>
+        </p>
+        <p>
+          Forgot password?{" "}
+          <Link href="/reset" className="font-semibold text-foreground underline">
+            Reset
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
