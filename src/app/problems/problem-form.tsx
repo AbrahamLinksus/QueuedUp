@@ -54,7 +54,7 @@ export function ProblemForm({
   const [platform, setPlatform] = useState(initial.platform ?? "OTHER");
   const [difficulty, setDifficulty] = useState(initial.difficulty ?? "MEDIUM");
   const [status, setStatus] = useState(initial.status ?? "ACTIVE_REVIEW");
-  const [autofillStatus, setAutofillStatus] = useState<string | null>(null);
+  const [autofillStatus, setAutofillStatus] = useState<{ ok: boolean; rateLimited?: boolean; msg: string } | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const inputClass =
@@ -65,13 +65,17 @@ export function ProblemForm({
     startTransition(async () => {
       const result = await fetchLeetCodeProblem(url);
       if ("error" in result) {
-        setAutofillStatus(result.error);
+        if (result.error === "rate-limited") {
+          setAutofillStatus({ ok: false, rateLimited: true, msg: "LeetCode rate limit hit — fill in the title and difficulty manually below." });
+        } else {
+          setAutofillStatus({ ok: false, msg: result.error });
+        }
         return;
       }
       setTitle(result.title);
       setDifficulty(result.difficulty);
       setPlatform("LEETCODE");
-      setAutofillStatus(`Filled "${result.title}" (${result.difficulty}).`);
+      setAutofillStatus({ ok: true, msg: `Filled "${result.title}" (${result.difficulty}).` });
     });
   }
 
@@ -113,7 +117,11 @@ export function ProblemForm({
             {isPending ? "…" : "Autofill"}
           </MotionButton>
         </div>
-        {autofillStatus && <p className="mt-1.5 text-xs text-muted">{autofillStatus}</p>}
+        {autofillStatus && (
+          <p className={`mt-1.5 text-xs ${autofillStatus.ok ? "text-muted" : autofillStatus.rateLimited ? "text-foreground font-medium" : "text-danger"}`}>
+            {autofillStatus.msg}
+          </p>
+        )}
         <input type="hidden" name="platform" value={platform} />
       </div>
 

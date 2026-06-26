@@ -126,6 +126,7 @@ export async function fetchLeetCodeProblem(url: string): Promise<LeetCodeFetchRe
       }),
     });
 
+    if (res.status === 429) return { error: "rate-limited" };
     if (!res.ok) return { error: "LeetCode request failed." };
 
     const json = await res.json();
