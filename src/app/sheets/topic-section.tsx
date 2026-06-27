@@ -36,7 +36,10 @@ export function TopicSection({
 }) {
   const [open, setOpen] = useState(defaultOpen);
 
-  const done = problems.filter((p) => loggedUrls.has(p.url)).length;
+  const normalizeUrl = (url: string) =>
+    url.toLowerCase().split(/[?#]/)[0].replace(/\/$/, "");
+
+  const done = problems.filter((p) => loggedUrls.has(normalizeUrl(p.url))).length;
 
   function addUrl(p: SheetRow) {
     const params = new URLSearchParams({
@@ -102,7 +105,7 @@ export function TopicSection({
       {open && (
         <div className="ml-3 border-l-[1.5px] border-foreground/15 pl-3">
           {problems.map((p) => {
-            const isLogged = loggedUrls.has(p.url);
+            const isLogged = loggedUrls.has(normalizeUrl(p.url));
             const color = DIFF_COLOR[p.difficulty] ?? "#666";
             return (
               <div

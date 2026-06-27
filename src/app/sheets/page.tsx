@@ -13,7 +13,11 @@ export default async function SheetsPage() {
     db.problem.findMany({ where: { userId }, select: { url: true } }),
   ]);
 
-  const loggedUrls = new Set(userProblems.map((p) => p.url));
+  // Normalize for comparison: lowercase, strip query/hash, strip trailing slash
+  const normalizeUrl = (url: string) =>
+    url.toLowerCase().split(/[?#]/)[0].replace(/\/$/, "");
+
+  const loggedUrls = new Set(userProblems.map((p) => normalizeUrl(p.url)));
 
   // Group by topic in canonical order
   const byTopic = new Map<string, typeof allProblems>();
@@ -24,7 +28,7 @@ export default async function SheetsPage() {
     // unknown topic → ignore (shouldn't happen)
   }
 
-  const totalLogged = allProblems.filter((p) => loggedUrls.has(p.url)).length;
+  const totalLogged = allProblems.filter((p) => loggedUrls.has(normalizeUrl(p.url))).length;
 
   return (
     <div className="space-y-4 pb-24">
