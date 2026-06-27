@@ -8,9 +8,10 @@ export function CodeBlock({ code, language }: { code: string; language?: string 
       style={oneDark}
       customStyle={{
         margin: 0,
-        borderRadius: "0.375rem",
+        borderRadius: 0,
         fontSize: "0.75rem",
-        background: "var(--background)",
+        background: "#1e1e1e",
+        padding: "1rem",
       }}
     >
       {code}

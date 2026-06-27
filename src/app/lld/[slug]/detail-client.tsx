@@ -106,9 +106,9 @@ export function LLDDetailClient({
 
           if (block.type === "code") {
             return (
-              <div key={i} className="rounded-xl border-[2px] border-foreground/15 overflow-hidden">
+              <div key={i} className="rounded-xl overflow-hidden" style={{ border: "2px solid #333" }}>
                 {block.caption && (
-                  <div className="bg-foreground/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.8px] text-muted border-b border-foreground/10">
+                  <div className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.8px] text-[#888]" style={{ background: "#2d2d2d", borderBottom: "1px solid #333" }}>
                     {block.caption}
                   </div>
                 )}
