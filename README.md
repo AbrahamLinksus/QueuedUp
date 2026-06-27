@@ -153,30 +153,6 @@ Server Components use Next.js `"use cache"` + `cacheTag` for user-specific data 
 
 ---
 
-## Local development
-
-**Prerequisites:** Node.js 20+, Docker (for local Postgres)
-
-```bash
-# 1. Start a local Postgres instance
-docker compose up -d
-
-# 2. Copy env file and fill in values
-cp .env.example .env
-
-# 3. Install dependencies
-npm install
-
-# 4. Run migrations and seed preset data
-npx prisma migrate deploy
-npm run db:seed
-
-# 5. Start the dev server
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000). Register an account (no passcode in dev), then start logging problems.
-
 ### Environment variables
 
 | Variable | Description |
