@@ -21,7 +21,7 @@ export default async function SchedulePage() {
         <h1 className="font-display text-[56px] leading-[0.9] tracking-[3px] text-foreground">
           SCHEDULE
         </h1>
-        <p className="mt-1.5 text-sm text-muted">60-day DSA + LLD master plan</p>
+        <p className="mt-1.5 text-sm text-muted">30-day DSA + LLD master plan</p>
       </div>
       <ScheduleClient schedule={SCHEDULE} phases={PHASES} />
     </div>

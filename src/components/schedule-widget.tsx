@@ -14,9 +14,9 @@ export function ScheduleWidget() {
     if (!sd) return;
     const cd = parseInt(localStorage.getItem("schedule:currentDay") ?? "1", 10);
     setStarted(true);
-    setCurrentDay(isNaN(cd) ? 1 : Math.max(1, Math.min(60, cd)));
+    setCurrentDay(isNaN(cd) ? 1 : Math.max(1, Math.min(30, cd)));
     let done = 0;
-    for (let d = 1; d <= 60; d++) {
+    for (let d = 1; d <= 30; d++) {
       if (localStorage.getItem(`schedule:done:${d}`) === "1") done++;
     }
     setDoneDays(done);
@@ -41,7 +41,7 @@ export function ScheduleWidget() {
 
   const plan = SCHEDULE.find((p) => p.day === currentDay);
   const phase = plan ? PHASES.find((ph) => ph.phase === plan.phase) : null;
-  const pct = Math.round((doneDays / 60) * 100);
+  const pct = Math.round((doneDays / 30) * 100);
 
   return (
     <Link
@@ -52,7 +52,7 @@ export function ScheduleWidget() {
         <div>
           <p className="text-[9px] font-bold uppercase tracking-[0.9px] text-muted">Schedule</p>
           <p className="mt-0.5 font-display text-[15px] tracking-[0.5px] text-foreground">
-            Day {currentDay} of 60
+            Day {currentDay} of 30
           </p>
           {plan && (
             <p className="text-[11px] text-muted truncate max-w-[180px]">{plan.topic}</p>

@@ -63,7 +63,7 @@ function DayDetail({
           onClick={onMarkDone}
           className="rounded-full border-[1.5px] border-foreground px-4 py-1.5 text-[12px] font-medium text-foreground transition-colors hover:bg-foreground/5"
         >
-          Mark as done → advance to Day {Math.min(plan.day + 1, 60)}
+          Mark as done → advance to Day {Math.min(plan.day + 1, 30)}
         </button>
       )}
       {isDone && (
@@ -242,10 +242,10 @@ export function ScheduleClient({
     const sd = localStorage.getItem("schedule:startDate");
     const cd = parseInt(localStorage.getItem("schedule:currentDay") ?? "1", 10);
     setStartDate(sd);
-    setCurrentDay(isNaN(cd) ? 1 : Math.max(1, Math.min(60, cd)));
+    setCurrentDay(isNaN(cd) ? 1 : Math.max(1, Math.min(30, cd)));
 
     const done = new Set<number>();
-    for (let d = 1; d <= 60; d++) {
+    for (let d = 1; d <= 30; d++) {
       if (localStorage.getItem(`schedule:done:${d}`) === "1") done.add(d);
     }
     setDoneDays(done);
@@ -280,7 +280,7 @@ export function ScheduleClient({
     localStorage.setItem(`schedule:done:${day}`, "1");
     setDoneDays((prev) => new Set([...prev, day]));
     if (day === currentDay) {
-      const next = Math.min(day + 1, 60);
+      const next = Math.min(day + 1, 30);
       localStorage.setItem("schedule:currentDay", String(next));
       setCurrentDay(next);
       // Auto-open the next day's phase
@@ -315,7 +315,7 @@ export function ScheduleClient({
         <div className="space-y-2">
           <p className="font-display text-[24px] tracking-[1px] text-foreground">Ready to begin?</p>
           <p className="text-[13px] leading-relaxed text-muted">
-            60 days · 10 hrs/day · 3 DSA sessions + 1 LLD session daily<br />
+            30 days · 10 hrs/day · 3 DSA sessions + 1 LLD session daily<br />
             DSA progresses from arrays to DP. LLD runs in parallel.<br />
             Miss a day? Just pick up where you left off tomorrow.
           </p>
@@ -332,7 +332,7 @@ export function ScheduleClient({
 
   const currentPlan = schedule.find((p) => p.day === currentDay);
   const totalDone = doneDays.size;
-  const pct = Math.round((totalDone / 60) * 100);
+  const pct = Math.round((totalDone / 30) * 100);
 
   const plansByPhase: Record<number, DayPlan[]> = {};
   for (const p of schedule) {
@@ -352,7 +352,7 @@ export function ScheduleClient({
           <div className="flex items-start justify-between">
             <div>
               <p className="font-display text-[20px] tracking-[0.5px] text-foreground">
-                Day {currentDay} of 60
+                Day {currentDay} of 30
               </p>
               <p className="text-[12px] text-muted">{currentPlan.phaseName}</p>
               <p className="mt-0.5 text-[13px] font-medium text-foreground">{currentPlan.topic}</p>
@@ -371,8 +371,7 @@ export function ScheduleClient({
           </div>
 
           <p className="text-[11px] text-muted">
-            Miss a day? No worries — you stay on Day {currentDay} until you mark it done.
-            Nothing cascades or gets lost.
+            Miss a day? You stay on Day {currentDay} until you mark it done — nothing shifts or gets lost.
           </p>
         </div>
       )}
