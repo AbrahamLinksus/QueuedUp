@@ -57,137 +57,129 @@ export default async function ReviewPage() {
   const todayStr = `${startOfToday.getFullYear()}-${String(startOfToday.getMonth() + 1).padStart(2, "0")}-${String(startOfToday.getDate()).padStart(2, "0")}`;
 
   return (
-    /*
-      Two-column grid on desktop.
-      Mobile (grid-cols-1 gap-3.5): items stack in DOM order →
-        header, due reviews, separator, flashcards, upcoming.
-      Desktop (md:grid-cols-[380px_1fr]): explicit col/row placement →
-        left=[header (r1), due reviews (r2), separator (r3)],
-        right=[upcoming (r1), flashcards (r2)].
-      md:col-start-* and md:row-start-* are no-ops on mobile (single col,
-      auto-placement follows DOM order).
-    */
-    <div className="grid grid-cols-1 gap-3.5 md:grid-cols-[380px_1fr] md:items-start md:gap-x-6 md:gap-y-4">
-      {/* Header — left col, row 1 on desktop */}
-      <div className="md:col-start-1 md:row-start-1">
-        <h1 className="font-display text-[56px] leading-[0.9] tracking-[3px] text-foreground">
-          REVIEW
-        </h1>
-        <div className="mt-1.5 flex items-center gap-2">
-          {dueReviews.length > 0 ? (
-            <>
-              <div className="h-2 w-2 shrink-0 rounded-full bg-danger" />
-              <p className="text-sm font-medium text-foreground">
-                {dueReviews.length} review{dueReviews.length !== 1 ? "s" : ""} due
-              </p>
-            </>
-          ) : (
-            <p className="text-sm text-muted">Nothing due right now.</p>
-          )}
-          <PushSubscribeButton />
+    <div className="flex flex-col gap-3.5 md:flex-row md:items-start md:gap-x-6">
+      {/* ── Left column ── */}
+      <div className="flex flex-col gap-3.5 md:w-[380px] md:shrink-0">
+        {/* Header */}
+        <div>
+          <h1 className="font-display text-[56px] leading-[0.9] tracking-[3px] text-foreground">
+            REVIEW
+          </h1>
+          <div className="mt-1.5 flex items-center gap-2">
+            {dueReviews.length > 0 ? (
+              <>
+                <div className="h-2 w-2 shrink-0 rounded-full bg-danger" />
+                <p className="text-sm font-medium text-foreground">
+                  {dueReviews.length} review{dueReviews.length !== 1 ? "s" : ""} due
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-muted">Nothing due right now.</p>
+            )}
+            <PushSubscribeButton />
+          </div>
         </div>
+
+        {/* Caught-up stats (only when nothing is due) */}
+        {dueReviews.length === 0 && (
+          <div className="grid grid-cols-2 gap-2.5">
+            <StatCard label="Reviewed Today" value={completedToday} index={0} />
+            <StatCard label="All Time" value={completedTotal} suffix="reviews" index={1} />
+          </div>
+        )}
+
+        {/* Due reviews */}
+        {dueReviews.length > 0 && (
+          <section className="space-y-3">
+            {dueReviews.map((review, index) => {
+              const isOverdue = review.scheduledFor < startOfToday;
+              const daysAgo = isOverdue
+                ? Math.round(
+                    (startOfToday.getTime() - review.scheduledFor.getTime()) / 86_400_000
+                  )
+                : undefined;
+              return (
+                <DueReviewRow
+                  key={review.id}
+                  review={review}
+                  isOverdue={isOverdue}
+                  daysAgo={daysAgo}
+                  index={index}
+                />
+              );
+            })}
+          </section>
+        )}
+
+        {/* Separator */}
+        {dueReviews.length > 0 && (
+          <div className="flex items-center gap-3 py-1">
+            <div className="h-[1.5px] flex-1 bg-foreground opacity-10" />
+            <span className="text-xs text-muted">
+              all caught up after {dueReviews.length === 1 ? "this" : "these"} {dueReviews.length}
+            </span>
+            <div className="h-[1.5px] flex-1 bg-foreground opacity-10" />
+          </div>
+        )}
       </div>
 
-      {/* Caught-up stats — left col, row 2 on desktop (only when nothing is due) */}
-      {dueReviews.length === 0 && (
-        <div className="grid grid-cols-2 gap-2.5 md:col-start-1 md:row-start-2">
-          <StatCard label="Reviewed Today" value={completedToday} index={0} />
-          <StatCard label="All Time" value={completedTotal} suffix="reviews" index={1} />
-        </div>
-      )}
+      {/* ── Right column ── */}
+      <div className="flex min-w-0 flex-1 flex-col gap-3.5">
+        {/* Upcoming */}
+        {upcomingReviews.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="font-display text-[22px] tracking-[1.5px] text-foreground">UPCOMING</h2>
+            <div className="overflow-hidden rounded-xl border-[2.5px] border-foreground bg-surface shadow-[3px_3px_0_#111]">
+              {upcomingReviews.map((review, i) => (
+                <div
+                  key={review.id}
+                  className={`flex items-center gap-3 px-4 py-3 text-sm ${
+                    i < upcomingReviews.length - 1 ? "border-b border-[#eee]" : ""
+                  }`}
+                >
+                  <Link
+                    href={`/problems/${review.problem.id}`}
+                    className="min-w-0 flex-1 truncate font-medium text-foreground hover:underline"
+                  >
+                    {review.problem.title}
+                  </Link>
+                  <span className="shrink-0 text-muted">+{review.dayOffset}d</span>
+                  <span className="shrink-0 text-muted">
+                    {review.scheduledFor.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
-      {/* Due reviews — left col, row 2 on desktop */}
-      {dueReviews.length > 0 && (
-        <section className="space-y-3 md:col-start-1 md:row-start-2">
-          {dueReviews.map((review, index) => {
-            const isOverdue = review.scheduledFor < startOfToday;
-            const daysAgo = isOverdue
-              ? Math.round(
-                  (startOfToday.getTime() - review.scheduledFor.getTime()) / 86_400_000
-                )
-              : undefined;
-            return (
-              <DueReviewRow
-                key={review.id}
-                review={review}
-                isOverdue={isOverdue}
-                daysAgo={daysAgo}
-                index={index}
-              />
-            );
-          })}
-        </section>
-      )}
+        {/* Flashcards */}
+        {dueFlashcards.length > 0 && (
+          <section className="space-y-3">
+            <div>
+              <h2 className="font-display text-[22px] tracking-[1.5px] text-foreground">
+                FLASHCARDS
+              </h2>
+              <p className="text-xs text-muted">
+                Mastered problems — a quick recall check, no need to re-solve.
+              </p>
+            </div>
+            <div className="space-y-2">
+              {dueFlashcards.map((problem, index) => (
+                <FlashcardItem
+                  key={problem.id}
+                  problem={problem}
+                  entry={problem.entries[0]}
+                  index={index}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
-      {/* Separator — left col, row 3 on desktop */}
-      {dueReviews.length > 0 && (
-        <div className="flex items-center gap-3 py-1 md:col-start-1 md:row-start-3">
-          <div className="h-[1.5px] flex-1 bg-foreground opacity-10" />
-          <span className="text-xs text-muted">
-            all caught up after {dueReviews.length === 1 ? "this" : "these"} {dueReviews.length}
-          </span>
-          <div className="h-[1.5px] flex-1 bg-foreground opacity-10" />
-        </div>
-      )}
-
-      {/* Flashcards — right col row 2 on desktop; appears before upcoming in DOM
-          so mobile order is preserved (flashcards first, upcoming last). */}
-      {dueFlashcards.length > 0 && (
-        <section className="space-y-3 md:col-start-2 md:row-start-2">
-          <div>
-            <h2 className="font-display text-[22px] tracking-[1.5px] text-foreground">
-              FLASHCARDS
-            </h2>
-            <p className="text-xs text-muted">
-              Mastered problems — a quick recall check, no need to re-solve.
-            </p>
-          </div>
-          <div className="space-y-2">
-            {dueFlashcards.map((problem, index) => (
-              <FlashcardItem
-                key={problem.id}
-                problem={problem}
-                entry={problem.entries[0]}
-                index={index}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Calendar — right col row 3, below upcoming + flashcards */}
-      <div className="md:col-start-2 md:row-start-3">
+        {/* Calendar */}
         <ReviewCalendar reviewsByDate={reviewsByDate} todayStr={todayStr} />
       </div>
-
-      {/* Upcoming — right col row 1 on desktop; last in DOM so it appears last
-          on mobile, but promoted to row 1 of the right col on desktop. */}
-      {upcomingReviews.length > 0 && (
-        <section className="space-y-3 md:col-start-2 md:row-start-1">
-          <h2 className="font-display text-[22px] tracking-[1.5px] text-foreground">UPCOMING</h2>
-          <div className="overflow-hidden rounded-xl border-[2.5px] border-foreground bg-surface shadow-[3px_3px_0_#111]">
-            {upcomingReviews.map((review, i) => (
-              <div
-                key={review.id}
-                className={`flex items-center gap-3 px-4 py-3 text-sm ${
-                  i < upcomingReviews.length - 1 ? "border-b border-[#eee]" : ""
-                }`}
-              >
-                <Link
-                  href={`/problems/${review.problem.id}`}
-                  className="min-w-0 flex-1 truncate font-medium text-foreground hover:underline"
-                >
-                  {review.problem.title}
-                </Link>
-                <span className="shrink-0 text-muted">+{review.dayOffset}d</span>
-                <span className="shrink-0 text-muted">
-                  {review.scheduledFor.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   );
 }
