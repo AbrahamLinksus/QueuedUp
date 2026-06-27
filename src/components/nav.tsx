@@ -25,9 +25,9 @@ export function Nav() {
       initial={{ y: 40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 300, damping: 28 }}
-      className="fixed inset-x-0 bottom-6 z-50 flex justify-center px-4"
+      className="fixed inset-x-0 bottom-6 z-50 flex justify-center px-2"
     >
-      <div className="flex items-center gap-1 rounded-full bg-[#111] p-1.5 shadow-[0_3px_14px_rgba(0,0,0,0.28)]">
+      <div className="flex items-center gap-0.5 rounded-full bg-[#111] p-1.5 shadow-[0_3px_14px_rgba(0,0,0,0.28)]">
         {/* Q. badge — also serves as Dashboard link */}
         <Link
           href="/"
@@ -44,7 +44,7 @@ export function Nav() {
             <Link
               key={link.href}
               href={link.href}
-              className={`rounded-full px-3.5 py-[7px] text-[12px] font-medium transition-colors whitespace-nowrap ${
+              className={`rounded-full px-2.5 py-[7px] text-[11px] font-medium transition-colors whitespace-nowrap ${
                 isActive ? "bg-white font-bold text-[#111]" : "text-white/60 hover:text-white/80"
               }`}
             >
@@ -55,7 +55,7 @@ export function Nav() {
 
         <Link
           href="/problems/new"
-          className="rounded-full border-[1.5px] border-white/40 px-3.5 py-[6px] text-[12px] font-bold text-white whitespace-nowrap"
+          className="rounded-full border-[1.5px] border-white/40 px-2.5 py-[6px] text-[11px] font-bold text-white whitespace-nowrap"
         >
           + New
         </Link>
