@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { getCurrentUserId } from "@/lib/session";
 import { getMainTopicsForTags } from "@/lib/topics";
 import { DeleteUserButton } from "./delete-user-button";
+import { AccessButtons } from "./access-buttons";
 
 const OWNER_USERNAME = (process.env.OWNER_USERNAME ?? "jake").toLowerCase();
 
@@ -73,6 +74,8 @@ export default async function AdminPage() {
     select: {
       username: true,
       createdAt: true,
+      lldAccess: true,
+      scheduleAccess: true,
       problems: {
         select: {
           status: true,
@@ -142,6 +145,7 @@ export default async function AdminPage() {
       username: u.username, createdAt: u.createdAt, total, mastered, active,
       easy, medium, hard, reviewsDone, reviewsSkipped, skipRate, overdue,
       nextReview, thisWeek, currentStreak, longestStreak, lastActive, topTopics,
+      lldAccess: u.lldAccess, scheduleAccess: u.scheduleAccess,
     };
   });
 
@@ -176,7 +180,14 @@ export default async function AdminPage() {
                   <p className="text-[10px] text-muted">best: {u.longestStreak} days</p>
                 )}
                 {u.username.toLowerCase() !== OWNER_USERNAME && (
-                  <DeleteUserButton username={u.username} />
+                  <>
+                    <AccessButtons
+                      username={u.username}
+                      lldAccess={u.lldAccess}
+                      scheduleAccess={u.scheduleAccess}
+                    />
+                    <DeleteUserButton username={u.username} />
+                  </>
                 )}
               </div>
             </div>

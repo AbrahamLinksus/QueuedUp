@@ -15,6 +15,7 @@ const PRIMARY_LINKS = [
 const SECONDARY_LINKS = [
   { href: "/recommend", label: "Find" },
   { href: "/lld", label: "LLD" },
+  { href: "/schedule", label: "Schedule" },
   // { href: "/leaderboard", label: "Ranks" },
 ];
 

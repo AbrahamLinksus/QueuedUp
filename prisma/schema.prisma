@@ -34,6 +34,8 @@ model User {
   username          String             @unique
   passwordHash      String
   createdAt         DateTime           @default(now())
+  lldAccess         Boolean            @default(false)
+  scheduleAccess    Boolean            @default(false)
   problems          Problem[]
   pushSubscriptions PushSubscription[]
 }
