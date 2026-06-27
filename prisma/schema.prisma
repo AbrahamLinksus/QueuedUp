@@ -111,12 +111,13 @@ model Review {
 }
 
 model SheetProblem {
-  id         String @id @default(cuid())
+  id         String  @id @default(cuid())
   title      String
-  url        String @unique
+  url        String  @unique
   difficulty String
   topic      String
-  order      Int    @unique
+  subtopic   String?
+  order      Int     @unique
 }
 
 model FlashcardReview {

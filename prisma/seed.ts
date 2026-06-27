@@ -14,31 +14,31 @@ const PRESET_TAGS = [
   "Matrix", "Interval", "Monotonic Stack", "Prefix Sum",
 ];
 
-type Problem = { t: string; u: string; d: "EASY" | "MEDIUM" | "HARD"; c: string };
+type Problem = { t: string; u: string; d: "EASY" | "MEDIUM" | "HARD"; c: string; s?: string };
 
 const BASE = "https://leetcode.com/problems/";
 
-// 500 problems across 13 topics ordered by prerequisites.
-// Within each topic: Easy → Medium → Hard.
+// Problems across 14 topics ordered by prerequisites.
+// s = subtopic (renders as nested sub-folder inside parent topic).
 const PROBLEMS: Problem[] = [
-  // ─── ARRAYS (1-55) ────────────────────────────────────────────────────────
+  // ─── ARRAYS (general) ─────────────────────────────────────────────────────
   { t: "Two Sum", u: "two-sum", d: "EASY", c: "arrays" },
   { t: "Best Time to Buy and Sell Stock", u: "best-time-to-buy-and-sell-stock", d: "EASY", c: "arrays" },
   { t: "Contains Duplicate", u: "contains-duplicate", d: "EASY", c: "arrays" },
-  { t: "Move Zeroes", u: "move-zeroes", d: "EASY", c: "arrays" },
+  { t: "Move Zeroes", u: "move-zeroes", d: "EASY", c: "arrays", s: "two-pointers" },
   { t: "Missing Number", u: "missing-number", d: "EASY", c: "arrays" },
   { t: "Single Number", u: "single-number", d: "EASY", c: "arrays" },
   { t: "Majority Element", u: "majority-element", d: "EASY", c: "arrays" },
   { t: "Plus One", u: "plus-one", d: "EASY", c: "arrays" },
-  { t: "Remove Duplicates from Sorted Array", u: "remove-duplicates-from-sorted-array", d: "EASY", c: "arrays" },
-  { t: "Squares of a Sorted Array", u: "squares-of-a-sorted-array", d: "EASY", c: "arrays" },
+  { t: "Remove Duplicates from Sorted Array", u: "remove-duplicates-from-sorted-array", d: "EASY", c: "arrays", s: "two-pointers" },
+  { t: "Squares of a Sorted Array", u: "squares-of-a-sorted-array", d: "EASY", c: "arrays", s: "two-pointers" },
   { t: "Maximum Subarray", u: "maximum-subarray", d: "EASY", c: "arrays" },
   { t: "Running Sum of 1d Array", u: "running-sum-of-1d-array", d: "EASY", c: "arrays" },
   { t: "Binary Search", u: "binary-search", d: "EASY", c: "arrays" },
   { t: "Merge Sorted Array", u: "merge-sorted-array", d: "EASY", c: "arrays" },
   { t: "Max Consecutive Ones", u: "max-consecutive-ones", d: "EASY", c: "arrays" },
-  { t: "3Sum", u: "3sum", d: "MEDIUM", c: "arrays" },
-  { t: "Container With Most Water", u: "container-with-most-water", d: "MEDIUM", c: "arrays" },
+  { t: "3Sum", u: "3sum", d: "MEDIUM", c: "arrays", s: "two-pointers" },
+  { t: "Container With Most Water", u: "container-with-most-water", d: "MEDIUM", c: "arrays", s: "two-pointers" },
   { t: "Product of Array Except Self", u: "product-of-array-except-self", d: "MEDIUM", c: "arrays" },
   { t: "Maximum Product Subarray", u: "maximum-product-subarray", d: "MEDIUM", c: "arrays" },
   { t: "Find Minimum in Rotated Sorted Array", u: "find-minimum-in-rotated-sorted-array", d: "MEDIUM", c: "arrays" },
@@ -53,21 +53,21 @@ const PROBLEMS: Problem[] = [
   { t: "Next Permutation", u: "next-permutation", d: "MEDIUM", c: "arrays" },
   { t: "Find the Duplicate Number", u: "find-the-duplicate-number", d: "MEDIUM", c: "arrays" },
   { t: "Subarray Sum Equals K", u: "subarray-sum-equals-k", d: "MEDIUM", c: "arrays" },
-  { t: "Minimum Size Subarray Sum", u: "minimum-size-subarray-sum", d: "MEDIUM", c: "arrays" },
-  { t: "Fruit Into Baskets", u: "fruit-into-baskets", d: "MEDIUM", c: "arrays" },
+  { t: "Minimum Size Subarray Sum", u: "minimum-size-subarray-sum", d: "MEDIUM", c: "arrays", s: "sliding-window" },
+  { t: "Fruit Into Baskets", u: "fruit-into-baskets", d: "MEDIUM", c: "arrays", s: "sliding-window" },
   { t: "Longest Consecutive Sequence", u: "longest-consecutive-sequence", d: "MEDIUM", c: "arrays" },
-  { t: "4Sum", u: "4sum", d: "MEDIUM", c: "arrays" },
-  { t: "Sort Colors", u: "sort-colors", d: "MEDIUM", c: "arrays" },
-  { t: "Two Sum II - Input Array Is Sorted", u: "two-sum-ii-input-array-is-sorted", d: "MEDIUM", c: "arrays" },
+  { t: "4Sum", u: "4sum", d: "MEDIUM", c: "arrays", s: "two-pointers" },
+  { t: "Sort Colors", u: "sort-colors", d: "MEDIUM", c: "arrays", s: "two-pointers" },
+  { t: "Two Sum II - Input Array Is Sorted", u: "two-sum-ii-input-array-is-sorted", d: "MEDIUM", c: "arrays", s: "two-pointers" },
   { t: "Rotate Array", u: "rotate-array", d: "MEDIUM", c: "arrays" },
   { t: "Game of Life", u: "game-of-life", d: "MEDIUM", c: "arrays" },
   { t: "Search a 2D Matrix", u: "search-a-2d-matrix", d: "MEDIUM", c: "arrays" },
   { t: "Find First and Last Position of Element in Sorted Array", u: "find-first-and-last-position-of-element-in-sorted-array", d: "MEDIUM", c: "arrays" },
   { t: "Kth Largest Element in an Array", u: "kth-largest-element-in-an-array", d: "MEDIUM", c: "arrays" },
   { t: "Non-overlapping Intervals", u: "non-overlapping-intervals", d: "MEDIUM", c: "arrays" },
-  { t: "Max Consecutive Ones III", u: "max-consecutive-ones-iii", d: "MEDIUM", c: "arrays" },
-  { t: "Minimum Operations to Reduce X to Zero", u: "minimum-operations-to-reduce-x-to-zero", d: "MEDIUM", c: "arrays" },
-  { t: "Trapping Rain Water", u: "trapping-rain-water", d: "HARD", c: "arrays" },
+  { t: "Max Consecutive Ones III", u: "max-consecutive-ones-iii", d: "MEDIUM", c: "arrays", s: "sliding-window" },
+  { t: "Minimum Operations to Reduce X to Zero", u: "minimum-operations-to-reduce-x-to-zero", d: "MEDIUM", c: "arrays", s: "sliding-window" },
+  { t: "Trapping Rain Water", u: "trapping-rain-water", d: "HARD", c: "arrays", s: "two-pointers" },
   { t: "First Missing Positive", u: "first-missing-positive", d: "HARD", c: "arrays" },
   { t: "Median of Two Sorted Arrays", u: "median-of-two-sorted-arrays", d: "HARD", c: "arrays" },
   { t: "Largest Rectangle in Histogram", u: "largest-rectangle-in-histogram", d: "HARD", c: "arrays" },
@@ -75,7 +75,7 @@ const PROBLEMS: Problem[] = [
   { t: "Best Time to Buy and Sell Stock III", u: "best-time-to-buy-and-sell-stock-iii", d: "HARD", c: "arrays" },
   { t: "Best Time to Buy and Sell Stock IV", u: "best-time-to-buy-and-sell-stock-iv", d: "HARD", c: "arrays" },
   { t: "Count of Smaller Numbers After Self", u: "count-of-smaller-numbers-after-self", d: "HARD", c: "arrays" },
-  { t: "Sliding Window Maximum", u: "sliding-window-maximum", d: "HARD", c: "arrays" },
+  { t: "Sliding Window Maximum", u: "sliding-window-maximum", d: "HARD", c: "arrays", s: "sliding-window" },
   { t: "Reverse Pairs", u: "reverse-pairs", d: "HARD", c: "arrays" },
 
   // ─── HASHING (56-80) ──────────────────────────────────────────────────────
@@ -531,6 +531,39 @@ const PROBLEMS: Problem[] = [
   { t: "Cherry Pickup", u: "cherry-pickup", d: "HARD", c: "dynamic programming" },
   { t: "Cherry Pickup II", u: "cherry-pickup-ii", d: "HARD", c: "dynamic programming" },
   { t: "Minimum Difficulty of a Job Schedule", u: "minimum-difficulty-of-a-job-schedule", d: "HARD", c: "dynamic programming" },
+
+  // ─── ARRAYS / TWO POINTERS (new additions) ───────────────────────────────
+  { t: "Backspace String Compare", u: "backspace-string-compare", d: "EASY", c: "arrays", s: "two-pointers" },
+  { t: "Is Subsequence", u: "is-subsequence", d: "EASY", c: "arrays", s: "two-pointers" },
+  { t: "3Sum Closest", u: "3sum-closest", d: "MEDIUM", c: "arrays", s: "two-pointers" },
+  { t: "Boats to Save People", u: "boats-to-save-people", d: "MEDIUM", c: "arrays", s: "two-pointers" },
+  { t: "Minimum Length of String After Deleting Similar Ends", u: "minimum-length-of-string-after-deleting-similar-ends", d: "MEDIUM", c: "arrays", s: "two-pointers" },
+  { t: "Valid Triangle Number", u: "valid-triangle-number", d: "MEDIUM", c: "arrays", s: "two-pointers" },
+
+  // ─── ARRAYS / SLIDING WINDOW (new additions) ─────────────────────────────
+  { t: "Maximum Average Subarray I", u: "maximum-average-subarray-i", d: "EASY", c: "arrays", s: "sliding-window" },
+  { t: "Count Number of Nice Subarrays", u: "count-number-of-nice-subarrays", d: "MEDIUM", c: "arrays", s: "sliding-window" },
+  { t: "Grumpy Bookstore Owner", u: "grumpy-bookstore-owner", d: "MEDIUM", c: "arrays", s: "sliding-window" },
+  { t: "Get Equal Substrings Within Budget", u: "get-equal-substrings-within-budget", d: "MEDIUM", c: "arrays", s: "sliding-window" },
+  { t: "Number of Substrings Containing All Three Characters", u: "number-of-substrings-containing-all-three-characters", d: "MEDIUM", c: "arrays", s: "sliding-window" },
+  { t: "Longest Turbulent Subarray", u: "longest-turbulent-subarray", d: "MEDIUM", c: "arrays", s: "sliding-window" },
+
+  // ─── BIT MANIPULATION ─────────────────────────────────────────────────────
+  { t: "Number of 1 Bits", u: "number-of-1-bits", d: "EASY", c: "bit manipulation" },
+  { t: "Reverse Bits", u: "reverse-bits", d: "EASY", c: "bit manipulation" },
+  { t: "Counting Bits", u: "counting-bits", d: "EASY", c: "bit manipulation" },
+  { t: "Power of Two", u: "power-of-two", d: "EASY", c: "bit manipulation" },
+  { t: "Hamming Distance", u: "hamming-distance", d: "EASY", c: "bit manipulation" },
+  { t: "Set Mismatch", u: "set-mismatch", d: "EASY", c: "bit manipulation" },
+  { t: "Find the Difference", u: "find-the-difference", d: "EASY", c: "bit manipulation" },
+  { t: "Number of Steps to Reduce a Number to Zero", u: "number-of-steps-to-reduce-a-number-to-zero", d: "EASY", c: "bit manipulation" },
+  { t: "Sum of Two Integers", u: "sum-of-two-integers", d: "MEDIUM", c: "bit manipulation" },
+  { t: "Single Number II", u: "single-number-ii", d: "MEDIUM", c: "bit manipulation" },
+  { t: "Single Number III", u: "single-number-iii", d: "MEDIUM", c: "bit manipulation" },
+  { t: "Bitwise AND of Numbers Range", u: "bitwise-and-of-numbers-range", d: "MEDIUM", c: "bit manipulation" },
+  { t: "Total Hamming Distance", u: "total-hamming-distance", d: "MEDIUM", c: "bit manipulation" },
+  { t: "Minimum Flips to Make a OR b Equal to c", u: "minimum-flips-to-make-a-or-b-equal-to-c", d: "MEDIUM", c: "bit manipulation" },
+  { t: "Maximum XOR of Two Numbers in an Array", u: "maximum-xor-of-two-numbers-in-an-array", d: "MEDIUM", c: "bit manipulation" },
 ];
 
 // Deduplicate by URL (some problems appear in multiple topic sections)
@@ -558,15 +591,16 @@ async function main() {
   const unique = dedup(PROBLEMS);
   let inserted = 0;
   for (let i = 0; i < unique.length; i++) {
-    const { t: title, u: slug, d: difficulty, c: topic } = unique[i];
+    const { t: title, u: slug, d: difficulty, c: topic, s: subtopic } = unique[i];
     await db.sheetProblem.upsert({
       where: { url: `${BASE}${slug}/` },
-      update: {},
+      update: subtopic !== undefined ? { subtopic } : {},
       create: {
         title,
         url: `${BASE}${slug}/`,
         difficulty,
         topic,
+        subtopic: subtopic ?? null,
         order: i + 1,
       },
     });

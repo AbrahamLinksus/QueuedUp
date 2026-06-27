@@ -8,6 +8,7 @@ const RECOMMEND_COUNT = 5;
 // Prerequisite DAG: topic → required topics
 export const PREREQS: Record<MainTopic, MainTopic[]> = {
   arrays: [],
+  "bit manipulation": ["arrays"],
   hashing: ["arrays"],
   string: ["arrays"],
   sorting: ["arrays"],
@@ -25,6 +26,7 @@ export const PREREQS: Record<MainTopic, MainTopic[]> = {
 // Canonical display order that reflects the DAG depth
 export const TOPIC_ORDER: MainTopic[] = [
   "arrays",
+  "bit manipulation",
   "hashing",
   "string",
   "sorting",
