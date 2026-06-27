@@ -1,6 +1,9 @@
+import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUserId } from "@/lib/session";
+
+const OWNER_USERNAME = (process.env.OWNER_USERNAME ?? "jake").toLowerCase();
 
 function toDateStr(d: Date) {
   const dt = new Date(d);
@@ -25,6 +28,8 @@ function calcStreak(dates: Date[]): number {
 export default async function LeaderboardPage() {
   await connection();
   const currentUserId = await getCurrentUserId();
+  const self = await db.user.findUnique({ where: { id: currentUserId }, select: { username: true } });
+  if (!self || self.username.toLowerCase() !== OWNER_USERNAME) redirect("/");
 
   const users = await db.user.findMany({
     select: {
