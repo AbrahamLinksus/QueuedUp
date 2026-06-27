@@ -7,6 +7,7 @@ import { DueReviewRow } from "./due-review-row";
 import { FlashcardItem } from "./flashcard-item";
 import { ReviewCalendar } from "./review-calendar";
 import { PushSubscribeButton } from "@/components/push-subscribe";
+import { StatCard } from "@/components/stat-card";
 
 export default async function ReviewPage() {
   await connection();
@@ -19,7 +20,7 @@ export default async function ReviewPage() {
 
   const sixMonthsOut = new Date(startOfToday.getFullYear(), startOfToday.getMonth() + 6, 0, 23, 59, 59, 999);
 
-  const [dueReviews, upcomingReviews, dueFlashcards, monthReviews] = await Promise.all([
+  const [dueReviews, upcomingReviews, dueFlashcards, monthReviews, completedToday, completedTotal] = await Promise.all([
     db.review.findMany({
       where: { status: "PENDING", scheduledFor: { lte: endOfToday }, problem: { userId } },
       include: { problem: true },
@@ -35,6 +36,12 @@ export default async function ReviewPage() {
     db.review.findMany({
       where: { status: "PENDING", scheduledFor: { gte: startOfToday, lte: sixMonthsOut }, problem: { userId } },
       select: { scheduledFor: true, problem: { select: { id: true, title: true, difficulty: true } } },
+    }),
+    db.review.count({
+      where: { status: "DONE", completedAt: { gte: startOfToday, lte: endOfToday }, problem: { userId } },
+    }),
+    db.review.count({
+      where: { status: "DONE", problem: { userId } },
     }),
   ]);
 
@@ -80,6 +87,14 @@ export default async function ReviewPage() {
           <PushSubscribeButton />
         </div>
       </div>
+
+      {/* Caught-up stats — left col, row 2 on desktop (only when nothing is due) */}
+      {dueReviews.length === 0 && (
+        <div className="grid grid-cols-2 gap-2.5 md:col-start-1 md:row-start-2">
+          <StatCard label="Reviewed Today" value={completedToday} index={0} />
+          <StatCard label="All Time" value={completedTotal} suffix="reviews" index={1} />
+        </div>
+      )}
 
       {/* Due reviews — left col, row 2 on desktop */}
       {dueReviews.length > 0 && (
