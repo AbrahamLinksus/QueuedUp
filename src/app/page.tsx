@@ -1,8 +1,12 @@
 import { connection } from "next/server";
 import { getDashboardStats } from "@/lib/stats";
 import { getCurrentUserId } from "@/lib/session";
+import { db } from "@/lib/db";
 import { Heatmap } from "@/components/heatmap";
 import { StatCard } from "@/components/stat-card";
+import { ScheduleWidget } from "@/components/schedule-widget";
+
+const OWNER_USERNAME = (process.env.OWNER_USERNAME ?? "jake").toLowerCase();
 
 function DifficultyBar({ breakdown }: { breakdown: Record<string, number> }) {
   const easy = breakdown.EASY ?? 0;
@@ -122,7 +126,11 @@ function Stickman({ quote }: { quote: string }) {
 export default async function Home() {
   await connection();
   const userId = await getCurrentUserId();
-  const stats = await getDashboardStats(userId);
+  const [stats, selfUser] = await Promise.all([
+    getDashboardStats(userId),
+    db.user.findUnique({ where: { id: userId }, select: { username: true, scheduleAccess: true } }),
+  ]);
+  const hasSchedule = selfUser?.username.toLowerCase() === OWNER_USERNAME || !!selfUser?.scheduleAccess;
   const today = new Date();
   const dateStr = today.toLocaleDateString("en-US", {
     weekday: "long",
@@ -176,8 +184,9 @@ export default async function Home() {
           </div>
         </div>
 
-        {/* Difficulty bar — left col, row 2 on desktop */}
-        <div className="md:col-start-1 md:row-start-2">
+        {/* Schedule widget + Difficulty bar — left col, row 2 on desktop */}
+        <div className="space-y-3.5 md:col-start-1 md:row-start-2">
+          {hasSchedule && <ScheduleWidget />}
           <DifficultyBar breakdown={stats.difficultyBreakdown} />
         </div>
 

@@ -5,32 +5,26 @@ import type { DayPlan } from "./data";
 
 type Phase = { phase: number; name: string; days: string; color: string };
 
-const MS_PER_DAY = 86_400_000;
-
-function getTodayDay(startDate: string): number {
-  const start = new Date(startDate + "T00:00:00").getTime();
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const diff = Math.floor((today.getTime() - start) / MS_PER_DAY) + 1;
-  return Math.max(1, Math.min(60, diff));
-}
-
 function SessionBlock({ block }: { block: DayPlan["sessions"][number] }) {
   if (block.type === "break" || block.type === "lunch") {
     return (
       <div className="flex items-center gap-3 rounded-lg bg-foreground/5 px-3 py-2">
-        <span className="text-[11px] text-muted">{block.start} – {block.end}</span>
+        <span className="shrink-0 text-[11px] text-muted">{block.start} – {block.end}</span>
         <span className="text-[12px] text-muted">{block.label}</span>
         {block.detail && <span className="text-[11px] text-muted/60">· {block.detail}</span>}
       </div>
     );
   }
+
+  const isLLD = block.label.startsWith("LLD:");
   return (
-    <div className="rounded-lg bg-foreground px-3 py-2.5">
-      <p className="text-[10px] font-bold uppercase tracking-wide text-background/50">
-        {block.start} – {block.end}
+    <div className={`rounded-lg px-3 py-2.5 ${isLLD ? "bg-foreground/15" : "bg-foreground"}`}>
+      <p className={`text-[10px] font-bold uppercase tracking-wide ${isLLD ? "text-foreground/40" : "text-background/50"}`}>
+        {block.start} – {block.end}{isLLD ? " · LLD" : ""}
       </p>
-      <p className="mt-0.5 text-[13px] leading-snug text-background">{block.label}</p>
+      <p className={`mt-0.5 text-[13px] leading-snug ${isLLD ? "text-foreground" : "text-background"}`}>
+        {isLLD ? block.label.replace(/^LLD:\s*/, "") : block.label}
+      </p>
     </div>
   );
 }
@@ -38,11 +32,15 @@ function SessionBlock({ block }: { block: DayPlan["sessions"][number] }) {
 function DayDetail({
   plan,
   isDone,
-  onToggle,
+  isCurrentDay,
+  onMarkDone,
+  onUnmarkDone,
 }: {
   plan: DayPlan;
   isDone: boolean;
-  onToggle: () => void;
+  isCurrentDay: boolean;
+  onMarkDone: () => void;
+  onUnmarkDone: () => void;
 }) {
   return (
     <div className="ml-10 mt-1 mb-3 space-y-3">
@@ -60,74 +58,72 @@ function DayDetail({
         ))}
       </div>
 
-      <button
-        onClick={onToggle}
-        className={`rounded-full border-[1.5px] px-4 py-1.5 text-[12px] font-medium transition-colors ${
-          isDone
-            ? "border-foreground/20 text-foreground/30 hover:border-foreground/40 hover:text-foreground/50"
-            : "border-foreground text-foreground hover:bg-foreground/5"
-        }`}
-      >
-        {isDone ? "✓ Marked as done" : "Mark as done"}
-      </button>
+      {isCurrentDay && !isDone && (
+        <button
+          onClick={onMarkDone}
+          className="rounded-full border-[1.5px] border-foreground px-4 py-1.5 text-[12px] font-medium text-foreground transition-colors hover:bg-foreground/5"
+        >
+          Mark as done → advance to Day {Math.min(plan.day + 1, 60)}
+        </button>
+      )}
+      {isDone && (
+        <button
+          onClick={onUnmarkDone}
+          className="rounded-full border-[1.5px] border-foreground/20 px-4 py-1.5 text-[12px] text-foreground/30 transition-colors hover:border-foreground/40 hover:text-foreground/50"
+        >
+          ✓ Done — undo
+        </button>
+      )}
     </div>
   );
 }
 
 function DayRow({
   plan,
-  isToday,
+  isCurrentDay,
   isDone,
   isSelected,
   onSelect,
-  onToggle,
+  onMarkDone,
+  onUnmarkDone,
 }: {
   plan: DayPlan;
-  isToday: boolean;
+  isCurrentDay: boolean;
   isDone: boolean;
   isSelected: boolean;
   onSelect: () => void;
-  onToggle: () => void;
+  onMarkDone: () => void;
+  onUnmarkDone: () => void;
 }) {
   return (
     <div>
       <button
         onClick={onSelect}
         className={`w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
-          isToday
+          isCurrentDay
             ? "bg-foreground/10"
             : isSelected
             ? "bg-foreground/5"
             : "hover:bg-foreground/5"
         }`}
       >
-        <span
-          className={`shrink-0 w-8 text-[11px] font-bold tabular-nums ${
-            isToday ? "text-foreground" : "text-muted"
-          }`}
-        >
+        <span className={`shrink-0 w-8 text-[11px] font-bold tabular-nums ${isCurrentDay ? "text-foreground" : "text-muted"}`}>
           D{plan.day}
         </span>
 
-        <span
-          className={`flex-1 min-w-0 truncate text-[13px] ${
-            isToday
-              ? "font-semibold text-foreground"
-              : isDone
-              ? "text-foreground/40"
-              : "text-foreground/80"
-          }`}
-        >
+        <span className={`flex-1 min-w-0 truncate text-[13px] ${
+          isCurrentDay ? "font-semibold text-foreground" : isDone ? "text-foreground/35" : "text-foreground/80"
+        }`}>
           {plan.topic}
         </span>
 
-        {isToday && (
+        {isCurrentDay && (
           <span className="shrink-0 rounded-full bg-foreground px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-background">
-            Today
+            Current
           </span>
         )}
 
-        {isDone && (
+        {isDone && !isCurrentDay && (
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0 text-foreground/25">
             <polyline points="1.5,6 4.5,9.5 10.5,2.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -143,7 +139,13 @@ function DayRow({
       </button>
 
       {isSelected && (
-        <DayDetail plan={plan} isDone={isDone} onToggle={onToggle} />
+        <DayDetail
+          plan={plan}
+          isDone={isDone}
+          isCurrentDay={isCurrentDay}
+          onMarkDone={onMarkDone}
+          onUnmarkDone={onUnmarkDone}
+        />
       )}
     </div>
   );
@@ -152,23 +154,25 @@ function DayRow({
 function PhaseSection({
   phase,
   plans,
-  todayDay,
+  currentDay,
   doneDays,
   isOpen,
   onToggle,
-  onToggleDone,
+  onMarkDone,
+  onUnmarkDone,
 }: {
   phase: Phase;
   plans: DayPlan[];
-  todayDay: number;
+  currentDay: number;
   doneDays: Set<number>;
   isOpen: boolean;
   onToggle: () => void;
-  onToggleDone: (day: number) => void;
+  onMarkDone: (day: number) => void;
+  onUnmarkDone: (day: number) => void;
 }) {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const phaseDone = plans.filter((p) => doneDays.has(p.day)).length;
-  const hasToday = plans.some((p) => p.day === todayDay);
+  const hasCurrent = plans.some((p) => p.day === currentDay);
 
   return (
     <div className="select-none">
@@ -184,16 +188,13 @@ function PhaseSection({
           <polyline points="3,2 7,5 3,8" />
         </svg>
 
-        <span
-          className="h-2.5 w-2.5 shrink-0 rounded-full"
-          style={{ backgroundColor: phase.color }}
-        />
+        <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: phase.color }} />
 
         <span className="flex-1 font-display text-[13px] tracking-[0.8px] text-foreground">
           Phase {phase.phase} — {phase.name}
         </span>
 
-        {hasToday && (
+        {hasCurrent && (
           <span className="shrink-0 text-[9px] font-bold uppercase tracking-wide text-foreground/50">
             Now
           </span>
@@ -210,11 +211,12 @@ function PhaseSection({
             <DayRow
               key={plan.day}
               plan={plan}
-              isToday={plan.day === todayDay}
+              isCurrentDay={plan.day === currentDay}
               isDone={doneDays.has(plan.day)}
               isSelected={selectedDay === plan.day}
               onSelect={() => setSelectedDay(selectedDay === plan.day ? null : plan.day)}
-              onToggle={() => onToggleDone(plan.day)}
+              onMarkDone={() => onMarkDone(plan.day)}
+              onUnmarkDone={() => onUnmarkDone(plan.day)}
             />
           ))}
         </div>
@@ -231,13 +233,16 @@ export function ScheduleClient({
   phases: Phase[];
 }) {
   const [startDate, setStartDate] = useState<string | null>(null);
+  const [currentDay, setCurrentDay] = useState(1);
   const [doneDays, setDoneDays] = useState<Set<number>>(new Set());
   const [openPhases, setOpenPhases] = useState<Set<number>>(new Set([1]));
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     const sd = localStorage.getItem("schedule:startDate");
+    const cd = parseInt(localStorage.getItem("schedule:currentDay") ?? "1", 10);
     setStartDate(sd);
+    setCurrentDay(isNaN(cd) ? 1 : Math.max(1, Math.min(60, cd)));
 
     const done = new Set<number>();
     for (let d = 1; d <= 60; d++) {
@@ -246,9 +251,8 @@ export function ScheduleClient({
     setDoneDays(done);
 
     if (sd) {
-      const todayDay = getTodayDay(sd);
-      const todayPlan = schedule.find((p) => p.day === todayDay);
-      if (todayPlan) setOpenPhases(new Set([todayPlan.phase]));
+      const activePlan = schedule.find((p) => p.day === cd);
+      if (activePlan) setOpenPhases(new Set([activePlan.phase]));
     }
 
     setLoaded(true);
@@ -257,7 +261,9 @@ export function ScheduleClient({
   function handleStart() {
     const today = new Date().toISOString().split("T")[0];
     localStorage.setItem("schedule:startDate", today);
+    localStorage.setItem("schedule:currentDay", "1");
     setStartDate(today);
+    setCurrentDay(1);
     setOpenPhases(new Set([1]));
   }
 
@@ -270,22 +276,35 @@ export function ScheduleClient({
     });
   }
 
-  function toggleDone(day: number) {
-    const isDone = doneDays.has(day);
-    if (isDone) localStorage.removeItem(`schedule:done:${day}`);
-    else localStorage.setItem(`schedule:done:${day}`, "1");
+  function handleMarkDone(day: number) {
+    localStorage.setItem(`schedule:done:${day}`, "1");
+    setDoneDays((prev) => new Set([...prev, day]));
+    if (day === currentDay) {
+      const next = Math.min(day + 1, 60);
+      localStorage.setItem("schedule:currentDay", String(next));
+      setCurrentDay(next);
+      // Auto-open the next day's phase
+      const nextPlan = schedule.find((p) => p.day === next);
+      if (nextPlan) setOpenPhases((prev) => new Set([...prev, nextPlan.phase]));
+    }
+  }
+
+  function handleUnmarkDone(day: number) {
+    localStorage.removeItem(`schedule:done:${day}`);
     setDoneDays((prev) => {
       const next = new Set(prev);
-      if (isDone) next.delete(day);
-      else next.add(day);
+      next.delete(day);
       return next;
     });
   }
 
   function handleReset() {
-    if (!confirm("Reset schedule? This will clear your start date but keep days marked as done.")) return;
+    if (!confirm("Reset schedule? This will clear your start date and current day (done days are kept).")) return;
     localStorage.removeItem("schedule:startDate");
+    localStorage.removeItem("schedule:currentDay");
     setStartDate(null);
+    setCurrentDay(1);
+    setOpenPhases(new Set([1]));
   }
 
   if (!loaded) return null;
@@ -296,9 +315,9 @@ export function ScheduleClient({
         <div className="space-y-2">
           <p className="font-display text-[24px] tracking-[1px] text-foreground">Ready to begin?</p>
           <p className="text-[13px] leading-relaxed text-muted">
-            60 days · 10 hours/day · 4 sessions + breaks<br />
-            DSA first (days 1–54), then LLD (days 55–60).<br />
-            Click start to lock in today as Day 1.
+            60 days · 10 hrs/day · 3 DSA sessions + 1 LLD session daily<br />
+            DSA progresses from arrays to DP. LLD runs in parallel.<br />
+            Miss a day? Just pick up where you left off tomorrow.
           </p>
         </div>
         <button
@@ -311,8 +330,7 @@ export function ScheduleClient({
     );
   }
 
-  const todayDay = getTodayDay(startDate);
-  const todayPlan = schedule.find((p) => p.day === todayDay);
+  const currentPlan = schedule.find((p) => p.day === currentDay);
   const totalDone = doneDays.size;
   const pct = Math.round((totalDone / 60) * 100);
 
@@ -329,15 +347,15 @@ export function ScheduleClient({
   return (
     <div className="space-y-3">
       {/* Progress card */}
-      {todayPlan && (
+      {currentPlan && (
         <div className="rounded-xl border-[2.5px] border-foreground bg-surface px-4 py-4 shadow-[3px_3px_0_#111] space-y-3">
           <div className="flex items-start justify-between">
             <div>
               <p className="font-display text-[20px] tracking-[0.5px] text-foreground">
-                Day {todayDay} of 60
+                Day {currentDay} of 60
               </p>
-              <p className="text-[12px] text-muted">{todayPlan.phaseName}</p>
-              <p className="mt-1 text-[13px] font-medium text-foreground">{todayPlan.topic}</p>
+              <p className="text-[12px] text-muted">{currentPlan.phaseName}</p>
+              <p className="mt-0.5 text-[13px] font-medium text-foreground">{currentPlan.topic}</p>
             </div>
             <div className="text-right">
               <p className="font-display text-[32px] leading-none text-foreground">{pct}%</p>
@@ -352,23 +370,17 @@ export function ScheduleClient({
             />
           </div>
 
-          <button
-            onClick={() => toggleDone(todayDay)}
-            className={`rounded-full border-[1.5px] px-4 py-1.5 text-[12px] font-medium transition-colors ${
-              doneDays.has(todayDay)
-                ? "border-foreground/20 text-foreground/30 hover:border-foreground/40"
-                : "border-foreground text-foreground hover:bg-foreground/5"
-            }`}
-          >
-            {doneDays.has(todayDay) ? "✓ Today done" : "Mark today as done"}
-          </button>
+          <p className="text-[11px] text-muted">
+            Miss a day? No worries — you stay on Day {currentDay} until you mark it done.
+            Nothing cascades or gets lost.
+          </p>
         </div>
       )}
 
       {/* Phase list */}
       <div className="rounded-xl border-[2.5px] border-foreground bg-surface p-3 shadow-[3px_3px_0_#111]">
         <p className="mb-2 px-2 text-[9px] font-bold uppercase tracking-[0.9px] text-muted">
-          60-Day Plan
+          60-Day Plan · 3 DSA + 1 LLD per day
         </p>
         <div className="space-y-0.5">
           {phases.map((phase) => (
@@ -376,11 +388,12 @@ export function ScheduleClient({
               key={phase.phase}
               phase={phase}
               plans={plansByPhase[phase.phase] ?? []}
-              todayDay={todayDay}
+              currentDay={currentDay}
               doneDays={doneDays}
               isOpen={openPhases.has(phase.phase)}
               onToggle={() => togglePhase(phase.phase)}
-              onToggleDone={toggleDone}
+              onMarkDone={handleMarkDone}
+              onUnmarkDone={handleUnmarkDone}
             />
           ))}
         </div>
@@ -389,10 +402,7 @@ export function ScheduleClient({
       <p className="text-center text-[10px] text-muted">
         Started {startFormatted}
         {" · "}
-        <button
-          onClick={handleReset}
-          className="underline transition-colors hover:text-foreground"
-        >
+        <button onClick={handleReset} className="underline transition-colors hover:text-foreground">
           reset
         </button>
       </p>

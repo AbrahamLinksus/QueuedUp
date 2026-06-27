@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { logout } from "@/app/login/actions";
 
 const PRIMARY_LINKS = [
@@ -22,6 +22,18 @@ const SECONDARY_LINKS = [
 export function Nav() {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!expanded) return;
+    function handleOutside(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setExpanded(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [expanded]);
 
   if (pathname === "/login" || pathname === "/register") return null;
 
@@ -35,7 +47,7 @@ export function Nav() {
       className="fixed inset-x-0 bottom-6 z-50 flex justify-center px-4"
     >
       {/* Wrapper is relative so the popup can be positioned above the pill */}
-      <div className="relative flex flex-col items-center gap-2">
+      <div ref={wrapperRef} className="relative flex flex-col items-center gap-2">
 
         {/* ── Vertical popup — appears above the pill ── */}
         <AnimatePresence>

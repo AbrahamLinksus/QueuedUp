@@ -257,9 +257,75 @@ function getSessionLabels(topic: string): [string, string, string, string] {
   ];
 }
 
+// ── LLD session (session 4) for every day ─────────────────────────────────
+// Sessions 1-3 are DSA. Session 4 rotates through LLD curriculum daily.
+const LLD_BY_DAY: Record<number, string> = {
+  1:  "LLD: OOP — Classes, objects, __init__, instance vs class vars",
+  2:  "LLD: OOP — Inheritance chains, super(), method resolution order",
+  3:  "LLD: OOP — Polymorphism: method overriding + duck typing",
+  4:  "LLD: OOP — Encapsulation: private attrs, @property decorator",
+  5:  "LLD: OOP — Abstraction: ABC module, abstract methods",
+  6:  "LLD: OOP — Aggregation vs Composition vs Association",
+  7:  "LLD: OOP — Interfaces via ABC + Protocols (structural subtyping)",
+  8:  "LLD: OOP — Static, instance, class methods — when to use each",
+  9:  "LLD: OOP — Magic methods: __str__, __repr__, __eq__, __hash__",
+  10: "LLD: Principles — Single Responsibility Principle (SRP)",
+  11: "LLD: Principles — Open/Closed Principle (OCP)",
+  12: "LLD: Principles — Liskov Substitution Principle (LSP)",
+  13: "LLD: Principles — Interface Segregation Principle (ISP)",
+  14: "LLD: Principles — Dependency Inversion Principle (DIP)",
+  15: "LLD: Principles — DRY: eliminate duplication with helpers/base classes",
+  16: "LLD: Principles — KISS & YAGNI: simplicity over cleverness",
+  17: "LLD: Principles — Law of Demeter: only talk to immediate friends",
+  18: "LLD: Principles — Composition over Inheritance in practice",
+  19: "LLD: Principles — SOLID review: critique a real code example",
+  20: "LLD: UML — Class diagrams: classes, attributes, methods, visibility",
+  21: "LLD: UML — Class relationships: association, aggregation, composition",
+  22: "LLD: UML — Sequence diagrams: lifelines, messages, activation boxes",
+  23: "LLD: UML — Use case diagrams: actors, include, extend",
+  24: "LLD: UML — Activity + State diagrams: control flow, state machines",
+  25: "LLD: Creational — Singleton: thread-safe Python implementation",
+  26: "LLD: Creational — Factory Method + Abstract Factory",
+  27: "LLD: Creational — Builder: step-by-step object construction",
+  28: "LLD: Creational — Prototype: deep copy, cloning pattern",
+  29: "LLD: Creational — Review: when to use each creational pattern",
+  30: "LLD: Structural — Adapter: interface translation between incompatible classes",
+  31: "LLD: Structural — Facade: unified interface to a complex subsystem",
+  32: "LLD: Structural — Decorator: wrap objects to add behaviour dynamically",
+  33: "LLD: Structural — Proxy: lazy loading, access control, logging",
+  34: "LLD: Structural — Composite: tree structures (file system, UI trees)",
+  35: "LLD: Structural — Bridge: decouple abstraction from implementation",
+  36: "LLD: Structural — Flyweight: shared objects to save memory + review",
+  37: "LLD: Behavioral — Observer: pub/sub, event system implementation",
+  38: "LLD: Behavioral — Strategy: interchangeable algorithms at runtime",
+  39: "LLD: Behavioral — Command: encapsulate actions, support undo/redo",
+  40: "LLD: Behavioral — State: vending machine state machine",
+  41: "LLD: Behavioral — Template Method: define skeleton, subclasses fill steps",
+  42: "LLD: Behavioral — Iterator: uniform collection traversal",
+  43: "LLD: Behavioral — Mediator: centralise communication between objects",
+  44: "LLD: Behavioral — Memento: snapshot + restore object state",
+  45: "LLD: Behavioral — Chain of Responsibility: pass request along handler chain",
+  46: "LLD: Behavioral — Visitor + Behavioral patterns review",
+  47: "LLD: Interview Tips — approach, structure, how to communicate design",
+  48: "LLD: Easy — Design Parking Lot: full class hierarchy + allocate/free logic",
+  49: "LLD: Easy — Design LRU Cache: DLL + HashMap full implementation",
+  50: "LLD: Easy — Design Tic Tac Toe: board, turns, winner detection",
+  51: "LLD: Easy — Design Snake and Ladder: board, dice, movement logic",
+  52: "LLD: Easy — Design Vending Machine: state machine + inventory",
+  53: "LLD: Medium — Design ATM: account, card, transaction, PIN flow",
+  54: "LLD: Medium — Design Movie Ticket Booking: seats, reservations, pricing",
+  55: "LLD: Medium — Design Library Management: books, members, fines",
+  56: "LLD: Medium — Design Hotel Booking: rooms, availability, billing",
+  57: "LLD: Medium — Design Online Shopping Cart: items, checkout, orders",
+  58: "LLD: Medium — Design Ride Sharing (Uber-like): driver, rider, matching",
+  59: "LLD: Medium — Design Social Media Feed: posts, likes, follows, ranking",
+  60: "LLD: Hard — Design Chess: pieces, move validation, game loop",
+};
+
 export const SCHEDULE: DayPlan[] = PLANS.map((p) => {
-  const [s1, s2, s3, s4] = getSessionLabels(p.topic);
-  return { ...p, sessions: makeSessions(s1, s2, s3, s4) };
+  const [s1, s2, s3] = getSessionLabels(p.topic);
+  const lldS4 = LLD_BY_DAY[p.day] ?? `LLD: Review day ${p.day} concepts`;
+  return { ...p, sessions: makeSessions(s1, s2, s3, lldS4) };
 });
 
 export const PHASES = [
